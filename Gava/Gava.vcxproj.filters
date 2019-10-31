@@ -27,6 +27,18 @@
     <ClInclude Include="classfile_constants.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="GavaProcess.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Instance.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StackFrame.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md">
@@ -38,6 +50,18 @@
       <Filter>源文件\ClassLoader</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GavaProcess.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Instance.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="StackFrame.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

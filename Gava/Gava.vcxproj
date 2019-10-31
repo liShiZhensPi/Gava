@@ -118,10 +118,18 @@
     <ClInclude Include="ClassFile.h" />
     <ClInclude Include="classfile_constants.h" />
     <ClInclude Include="classfile_typedef.h" />
+    <ClInclude Include="GavaProcess.h" />
+    <ClInclude Include="Instance.h" />
+    <ClInclude Include="StackFrame.h" />
+    <ClInclude Include="Thread.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClassFile.cpp" />
+    <ClCompile Include="GavaProcess.cpp" />
+    <ClCompile Include="Instance.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="StackFrame.cpp" />
+    <ClCompile Include="Thread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
