@@ -1,0 +1,90 @@
+#pragma once
+typedef unsigned int u4;
+typedef unsigned short u2;
+typedef char u1;
+
+typedef struct{
+	u2 name_index;
+}CONSTANT_Class_info;
+
+typedef struct {
+	u2 class_index;
+	u2 name_and_type_index;
+}CONSTANT_Fieldref_info,CONSTANT_Methodref_info,CONSTANT_InterfaceMethodref_info;
+
+typedef struct {
+	u2 string_index;
+}CONSTANT_String_info;
+
+typedef struct {
+	u4 bytes;
+}CONSTANT_Integer_info,CONSTANT_Float_info;
+
+typedef struct {
+	u4 high_bytes;
+	u4 low_bytes;
+}CONSTANT_Long_info,CONSTANT_Double_info;
+
+typedef struct {
+	u2 name_index;
+	u2 descriptor_index;
+}CONSTANT_NameAndType_info;
+
+typedef struct {
+	u2 length;
+	u1 *bytes;
+}CONSTANT_Utf8_info;
+
+typedef struct {
+	u1 reference_kind;
+	u2 reference_index;
+}CONSTANT_MethodHandle_info;
+
+typedef struct {
+	u2 descriptor_index;
+}CONSTANT_MethodType_info;
+
+typedef struct {
+	u2 bootstrap_method_attr_index;
+	u2 name_and_type_index;
+}CONSTANT_InvokeDynamic_info;
+
+typedef struct {
+	u1 tag;
+	union {
+		CONSTANT_Class_info class_info;
+		CONSTANT_Double_info double_info;
+		CONSTANT_Float_info float_info;
+		CONSTANT_Fieldref_info fieldref_info;
+		CONSTANT_Integer_info integer_info;
+		CONSTANT_InterfaceMethodref_info interfaceMethodref_info;
+		CONSTANT_InvokeDynamic_info invokeDynamic_info;
+		CONSTANT_Long_info long_info;
+		CONSTANT_MethodHandle_info methodHandle_info;
+		CONSTANT_Methodref_info methodref_info;
+		CONSTANT_MethodType_info methodType_info;
+		CONSTANT_NameAndType_info nameAndType_info;
+		CONSTANT_String_info string_info;
+		CONSTANT_Utf8_info utf8_info;
+	};
+}CpInfo;
+
+typedef enum Constant_Pool_Entries Tags;
+
+typedef u2 InterfacesInfo;
+
+typedef struct {
+	u2 attribute_name_index;
+	u4 attribute_length;
+	u1* info;
+}AttributeInfo;
+
+typedef struct {
+	u2 access_flags;
+	u2 name_index;
+	u2 descriptor_index;
+	u2 attributes_count;
+	AttributeInfo *attributes;
+}FieldInfo,MethodInfo;
+
+

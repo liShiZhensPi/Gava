@@ -13,14 +13,31 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="源文件\ClassLoader">
+      <UniqueIdentifier>{4fde6381-ee18-42cd-85d5-787fe991ee8a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ClassLoader.h">
+    <ClInclude Include="ClassFile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="classfile_typedef.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="classfile_constants.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ClassLoader.cpp">
+    <None Include="..\README.md">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ClassFile.cpp">
+      <Filter>源文件\ClassLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

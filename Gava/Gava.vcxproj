@@ -115,10 +115,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ClassLoader.h" />
+    <ClInclude Include="ClassFile.h" />
+    <ClInclude Include="classfile_constants.h" />
+    <ClInclude Include="classfile_typedef.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ClassLoader.cpp" />
+    <ClCompile Include="ClassFile.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
