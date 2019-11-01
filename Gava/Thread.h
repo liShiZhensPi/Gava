@@ -7,10 +7,11 @@ using namespace std;
 class Thread
 {
 public:
-	Thread(string name,u1 *codes);
+	Thread(string name,Code_attribute *code);
+	StackFrame* getStackFrame();
 	~Thread();
 private:
 	string name;
-	stack<StackFrame> VMStack;
+	stack<StackFrame*> VMStack;
 };
 

@@ -13,8 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="源文件\ClassLoader">
-      <UniqueIdentifier>{4fde6381-ee18-42cd-85d5-787fe991ee8a}</UniqueIdentifier>
+    <Filter Include="源文件\RuntimeDate">
+      <UniqueIdentifier>{6d5050e4-b2e4-420d-9f1c-8284c094a40a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\ExecuteEngine">
+      <UniqueIdentifier>{85665974-b684-42a6-a795-ca1828f34971}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -27,9 +30,6 @@
     <ClInclude Include="classfile_constants.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="GavaProcess.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Thread.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -39,6 +39,21 @@
     <ClInclude Include="StackFrame.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="OpStack.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="LocalTable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Process.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ExecuteEngine.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Opcodes.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md">
@@ -46,23 +61,32 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ClassFile.cpp">
-      <Filter>源文件\ClassLoader</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="GavaProcess.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="ClassFile.cpp">
+      <Filter>源文件\RuntimeDate</Filter>
     </ClCompile>
-    <ClCompile Include="Thread.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="LocalTable.cpp">
+      <Filter>源文件\RuntimeDate</Filter>
     </ClCompile>
     <ClCompile Include="Instance.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\RuntimeDate</Filter>
+    </ClCompile>
+    <ClCompile Include="OpStack.cpp">
+      <Filter>源文件\RuntimeDate</Filter>
+    </ClCompile>
+    <ClCompile Include="Process.cpp">
+      <Filter>源文件\RuntimeDate</Filter>
     </ClCompile>
     <ClCompile Include="StackFrame.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\RuntimeDate</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread.cpp">
+      <Filter>源文件\RuntimeDate</Filter>
+    </ClCompile>
+    <ClCompile Include="ExecuteEngine.cpp">
+      <Filter>源文件\ExecuteEngine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

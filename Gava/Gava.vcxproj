@@ -118,16 +118,23 @@
     <ClInclude Include="ClassFile.h" />
     <ClInclude Include="classfile_constants.h" />
     <ClInclude Include="classfile_typedef.h" />
-    <ClInclude Include="GavaProcess.h" />
+    <ClInclude Include="ExecuteEngine.h" />
+    <ClInclude Include="Opcodes.h" />
+    <ClInclude Include="Process.h" />
     <ClInclude Include="Instance.h" />
+    <ClInclude Include="LocalTable.h" />
+    <ClInclude Include="OpStack.h" />
     <ClInclude Include="StackFrame.h" />
     <ClInclude Include="Thread.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClassFile.cpp" />
-    <ClCompile Include="GavaProcess.cpp" />
+    <ClCompile Include="ExecuteEngine.cpp" />
+    <ClCompile Include="Process.cpp" />
     <ClCompile Include="Instance.cpp" />
+    <ClCompile Include="LocalTable.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="OpStack.cpp" />
     <ClCompile Include="StackFrame.cpp" />
     <ClCompile Include="Thread.cpp" />
   </ItemGroup>

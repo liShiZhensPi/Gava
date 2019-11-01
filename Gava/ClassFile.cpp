@@ -187,3 +187,54 @@ ClassFile::~ClassFile()
 {
 	f.close();
 }
+
+
+Code_attribute* ClassFile::getMethodByNameAndType(string main_name, string main_type)
+{
+	MethodInfo* method = NULL;
+	for (int i = 0; i < methods_count; i++) {
+		//class文件规范的检查在类文件加载时进行
+		u1 *name = constant_pools[methods[i].name_index].utf8_info.bytes;
+		u2 name_length = constant_pools[methods[i].name_index].utf8_info.length;
+		u1 *type = constant_pools[methods[i].descriptor_index].utf8_info.bytes;
+		u2 type_length = constant_pools[methods[i].descriptor_index].utf8_info.length;
+		if (constant_utf8_equal(name,name_length,main_name) == 0 && constant_utf8_equal(type,type_length,main_type) == 0) {
+			method = &methods[i];
+			break;
+		}
+	}
+	if (method == NULL) {
+		cerr << "Can't find main method" << endl;
+		exit(-1);
+	}
+	
+	u1 *info = NULL;
+	for (int i = 0; i < method->attributes_count; i++) {
+		u1 *name = constant_pools[method->attributes[i].attribute_name_index].utf8_info.bytes;
+		u2 name_length = constant_pools[method->attributes[i].attribute_name_index].utf8_info.length;
+		if ( constant_utf8_equal(name,name_length,"Code")== 0) {
+			info = method->attributes[i].info;
+			break;
+		}
+	}
+	if (info == NULL) {
+		cerr << "Can't find code" << endl;
+		exit(-1);
+	}
+
+	Code_attribute *code = new Code_attribute();
+	code->max_stack = (((u2)info[0]<<8)&0xff00) | ((u2)info[1]&0x00ff);
+	code->max_locals = (((u2)info[2] << 8) & 0xff00) | ((u2)info[3] & 0x00ff);
+	code->code_length = (((u2)info[4] << 24) & 0xff000000) | (((u2)info[5] << 16) & 0x00ff0000) | (((u2)info[6] << 8) & 0x0000ff00) | (((u2)info[7]) & 0x000000ff);
+	code->codes = &info[8];//info[8~8+code_length]为代码
+	return code;
+}
+
+int ClassFile::constant_utf8_equal(u1 *s, u2 length,string str) {
+	if (length != str.length())
+		return -1;
+	for (int i = 0; i < length; i++)
+		if (s[i] != str.data()[i])
+			return -1;
+	return 0;
+}

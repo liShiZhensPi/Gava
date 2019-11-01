@@ -93,7 +93,7 @@ enum {
 
 /* Constant Pool Entries */
 
-enum Constant_Pool_Entries{
+enum Tags{
     JVM_CONSTANT_Utf8                   = 1,
     JVM_CONSTANT_Unicode                = 2, /* unused */
     JVM_CONSTANT_Integer                = 3,

@@ -10,12 +10,14 @@ class Process
 {
 public:
 
-	Process(string mainClass,ClassFile main);
+	Process(string mainClass,ClassFile *main);
+	Thread* getMainThread();
+	ClassFile* getMainClass();
 	~Process();
 private:
-	vector<Thread> threads;
+	vector<Thread*> threads;
 	string mainClass;
-	map<string, ClassFile> classFiles;
-	vector<Instance> instances;
+	map<string, ClassFile*> classFiles;
+	vector<Instance*> instances;
 };
 

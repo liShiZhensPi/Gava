@@ -29,12 +29,15 @@ public:
 
 
 	ClassFile(string filename);
+	int constant_utf8_equal(u1* s, u2 length, string str);
+	Code_attribute* getMethodByNameAndType(string name,string type);
 	~ClassFile();
 private:
 	fstream f;
 	u1 getU1();
 	u2 getU2();
 	u4 getU4();
+	
 	
 	void parseFile();
 	void parseConstantPools();

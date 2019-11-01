@@ -69,7 +69,6 @@ typedef struct {
 	};
 }CpInfo;
 
-typedef enum Constant_Pool_Entries Tags;
 
 typedef u2 InterfacesInfo;
 
@@ -86,5 +85,12 @@ typedef struct {
 	u2 attributes_count;
 	AttributeInfo *attributes;
 }FieldInfo,MethodInfo;
+
+typedef struct {
+	u2 max_stack;
+	u2 max_locals;
+	u4 code_length;
+	u1 *codes;
+}Code_attribute;
 
 
