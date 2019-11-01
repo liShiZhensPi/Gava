@@ -12,7 +12,7 @@ ExecuteEngine::ExecuteEngine(Process *process)
 
 void ExecuteEngine::execute() {
 	short opcode_length[] = JVM_OPCODE_LENGTH_INITIALIZER;
-	int flag = 0;
+	u4 null = 0;
 	while (currentFrame->hasCode()) {
 		u1 code = currentFrame->getCode();
 		switch (code)
@@ -21,36 +21,47 @@ void ExecuteEngine::execute() {
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case aconst_null: //0x01 	将null推送至栈顶
+			currentFrame->pusha(null);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iconst_m1: //0x02 	将int型-1推送至栈顶
+			currentFrame->pushi(-1);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iconst_0: //0x03 	将int型0推送至栈顶
+			currentFrame->pushi(0);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iconst_1: //0x04 	将int型1推送至栈顶
+			currentFrame->pushi(1);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iconst_2: //0x05 	将int型2推送至栈顶
+			currentFrame->pushi(2);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iconst_3: //0x06 	将int型3推送至栈顶
+			currentFrame->pushi(3);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iconst_4: //0x07 	将int型4推送至栈顶
+			currentFrame->pushi(4);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iconst_5: //0x08 	将int型5推送至栈顶
+			currentFrame->pushi(5);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lconst_0: //0x09 	将long型0推送至栈顶
+			currentFrame->pushl(0);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lconst_1: //0x0a 	将long型1推送至栈顶
+			currentFrame->pushl(1);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case fconst_0: //0x0b 	将float型0推送至栈顶
+			currentFrame->pushf(0);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case fconst_1: //0x0c 	将float型1推送至栈顶

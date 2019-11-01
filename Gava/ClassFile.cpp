@@ -73,7 +73,7 @@ void ClassFile::parseConstantPools() {
 			break;
 		case Tags::JVM_CONSTANT_Utf8:
 			constant_pools[i].utf8_info.length = getU2();
-			constant_pools[i].utf8_info.bytes = new u1[constant_pools[i].utf8_info.length];
+			constant_pools[i].utf8_info.bytes = new char[constant_pools[i].utf8_info.length];
 			f.read(constant_pools[i].utf8_info.bytes, constant_pools[i].utf8_info.length*sizeof(u1));
 			/*for (int j = 0; j < constant_pools[i].utf8_info.length; j++)
 				constant_pools[i].utf8_info.bytes[j] = getU1();*/
@@ -114,7 +114,7 @@ void ClassFile::parseFields() {
 		for (int j = 0; j < fields[i].attributes_count; j++) {
 			fields[i].attributes[j].attribute_name_index = getU2();
 			fields[i].attributes[j].attribute_length = getU4();
-			fields[i].attributes[j].info = new u1[fields[i].attributes[j].attribute_length];
+			fields[i].attributes[j].info = new char[fields[i].attributes[j].attribute_length];
 			f.read(fields[i].attributes[j].info, fields[i].attributes[j].attribute_length * sizeof(u1));
 			/*for (int k = 0; k < fields[i].attributes[j].attribute_length; k++)
 				fields[i].attributes[j].info[k] = getU1();*/
@@ -135,7 +135,7 @@ void ClassFile::parseMethods() {
 		for (int j = 0; j < methods[i].attributes_count; j++) {
 			methods[i].attributes[j].attribute_name_index = getU2();
 			methods[i].attributes[j].attribute_length = getU4();
-			methods[i].attributes[j].info = new u1[methods[i].attributes[j].attribute_length];
+			methods[i].attributes[j].info = new char[methods[i].attributes[j].attribute_length];
 			f.read(methods[i].attributes[j].info, methods[i].attributes[j].attribute_length * sizeof(u1));
 			/*for (int k = 0; k < methods[i].attributes[j].attribute_length; k++)
 				methods[i].attributes[j].info[k] = getU1();*/
@@ -150,7 +150,7 @@ void ClassFile::parseAttributes() {
 	for (int i = 0; i < attributes_count; i++) {
 		attributes[i].attribute_name_index = getU2();
 		attributes[i].attribute_length = getU4();
-		attributes[i].info = new u1[attributes[i].attribute_length];
+		attributes[i].info = new char[attributes[i].attribute_length];
 		f.read(attributes[i].info, attributes[i].attribute_length * sizeof(u1));
 		/*for (int j = 0; j < attributes[i].attribute_length; j++)
 			attributes[i].info[j] = getU1();*/
@@ -158,24 +158,24 @@ void ClassFile::parseAttributes() {
 }
 
 u1 ClassFile::getU1() {
-	u1 b1;
+	char b1;
 	f.read(&b1, sizeof(char));
 	return b1;
 }
 
 u2 ClassFile::getU2() {
-	u1 b1;
-	u1 b2;
+	char b1;
+	char b2;
 	f.read(&b1, sizeof(char));
 	f.read(&b2, sizeof(char));
 	return (u2)b1 << 8 | ((u2)b2 & 0x00ff);
 }
 
 u4 ClassFile::getU4() {
-	u1 b1;
-	u1 b2;
-	u1 b3;
-	u1 b4;
+	char b1;
+	char b2;
+	char b3;
+	char b4;
 	f.read(&b1, sizeof(char));
 	f.read(&b2, sizeof(char));
 	f.read(&b3, sizeof(char));
@@ -194,9 +194,9 @@ Code_attribute* ClassFile::getMethodByNameAndType(string main_name, string main_
 	MethodInfo* method = NULL;
 	for (int i = 0; i < methods_count; i++) {
 		//class文件规范的检查在类文件加载时进行
-		u1 *name = constant_pools[methods[i].name_index].utf8_info.bytes;
+		char *name = constant_pools[methods[i].name_index].utf8_info.bytes;
 		u2 name_length = constant_pools[methods[i].name_index].utf8_info.length;
-		u1 *type = constant_pools[methods[i].descriptor_index].utf8_info.bytes;
+		char *type = constant_pools[methods[i].descriptor_index].utf8_info.bytes;
 		u2 type_length = constant_pools[methods[i].descriptor_index].utf8_info.length;
 		if (constant_utf8_equal(name,name_length,main_name) == 0 && constant_utf8_equal(type,type_length,main_type) == 0) {
 			method = &methods[i];
@@ -208,9 +208,9 @@ Code_attribute* ClassFile::getMethodByNameAndType(string main_name, string main_
 		exit(-1);
 	}
 	
-	u1 *info = NULL;
+	char *info = NULL;
 	for (int i = 0; i < method->attributes_count; i++) {
-		u1 *name = constant_pools[method->attributes[i].attribute_name_index].utf8_info.bytes;
+		char *name = constant_pools[method->attributes[i].attribute_name_index].utf8_info.bytes;
 		u2 name_length = constant_pools[method->attributes[i].attribute_name_index].utf8_info.length;
 		if ( constant_utf8_equal(name,name_length,"Code")== 0) {
 			info = method->attributes[i].info;
@@ -230,7 +230,7 @@ Code_attribute* ClassFile::getMethodByNameAndType(string main_name, string main_
 	return code;
 }
 
-int ClassFile::constant_utf8_equal(u1 *s, u2 length,string str) {
+int ClassFile::constant_utf8_equal(char *s, u2 length,string str) {
 	if (length != str.length())
 		return -1;
 	for (int i = 0; i < length; i++)

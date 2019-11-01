@@ -29,7 +29,7 @@ public:
 
 
 	ClassFile(string filename);
-	int constant_utf8_equal(u1* s, u2 length, string str);
+	int constant_utf8_equal(char* s, u2 length, string str);
 	Code_attribute* getMethodByNameAndType(string name,string type);
 	~ClassFile();
 private:

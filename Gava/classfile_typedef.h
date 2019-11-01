@@ -1,7 +1,7 @@
 #pragma once
 typedef unsigned int u4;
 typedef unsigned short u2;
-typedef char u1;
+typedef unsigned char u1;
 
 typedef struct{
 	u2 name_index;
@@ -32,7 +32,7 @@ typedef struct {
 
 typedef struct {
 	u2 length;
-	u1 *bytes;
+	char *bytes;
 }CONSTANT_Utf8_info;
 
 typedef struct {
@@ -75,7 +75,7 @@ typedef u2 InterfacesInfo;
 typedef struct {
 	u2 attribute_name_index;
 	u4 attribute_length;
-	u1* info;
+	char* info;
 }AttributeInfo;
 
 typedef struct {
@@ -90,7 +90,7 @@ typedef struct {
 	u2 max_stack;
 	u2 max_locals;
 	u4 code_length;
-	u1 *codes;
+	char *codes;
 }Code_attribute;
 
 

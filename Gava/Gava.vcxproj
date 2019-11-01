@@ -126,6 +126,7 @@
     <ClInclude Include="OpStack.h" />
     <ClInclude Include="StackFrame.h" />
     <ClInclude Include="Thread.h" />
+    <ClInclude Include="typeTrabslate.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClassFile.cpp" />
