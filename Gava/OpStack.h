@@ -10,6 +10,7 @@ public:
 	OpStack(u2 length);
 	u4 pop();
 	void push(u4 value);
+	void print();
 	~OpStack();
 };
 

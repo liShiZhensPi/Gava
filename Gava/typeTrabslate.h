@@ -11,7 +11,7 @@ typedef union {
 
 typedef union {
 	u4 U4[2];
-	long l;
+	long long l;
 	double d;
 }stackType2;
 

@@ -16,6 +16,13 @@ void OpStack::push(u4 value)
 	stack[index++] = value;
 }
 
+void OpStack::print()
+{
+	cout << "OpstackLength: " <<index<< endl;
+	for (int i = index - 1; i >= 0; i--)
+		cout << stack[i] << endl;
+}
+
 u4 OpStack::pop() 
 {
 	if (index == 0) {

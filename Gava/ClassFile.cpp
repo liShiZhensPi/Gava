@@ -62,10 +62,12 @@ void ClassFile::parseConstantPools() {
 		case Tags::JVM_CONSTANT_Long:
 			constant_pools[i].long_info.high_bytes = getU4();
 			constant_pools[i].long_info.low_bytes = getU4();
+			i++;
 			break;
 		case Tags::JVM_CONSTANT_Double:
 			constant_pools[i].double_info.high_bytes = getU4();
 			constant_pools[i].double_info.low_bytes = getU4();
+			i++;
 			break;
 		case JVM_CONSTANT_NameAndType:
 			constant_pools[i].nameAndType_info.name_index = getU2();
@@ -88,8 +90,9 @@ void ClassFile::parseConstantPools() {
 		case Tags::JVM_CONSTANT_InvokeDynamic:
 			constant_pools[i].invokeDynamic_info.bootstrap_method_attr_index = getU2();
 			constant_pools[i].invokeDynamic_info.name_and_type_index = getU2();
+			break;
 		default:
-			cout << "UnKnow tag" << endl;
+			cout << "UnKnow tag:" << constant_pools[i].tag<< endl;
 			exit(0);
 		}
 	}

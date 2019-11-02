@@ -6,7 +6,7 @@
 
 int main(int argc,char* argv[]) {
 
-	/*if (argc < 2) {
+	if (argc < 2) {
 		cout << "Please input Gava class file" << endl;
 		return 0;
 	}
@@ -15,6 +15,6 @@ int main(int argc,char* argv[]) {
 	Process *process = new Process("Test.class", file);
 	ExecuteEngine *engine = new ExecuteEngine(process);
 	engine->execute();
-	getchar();*/
+	getchar();
 
 }

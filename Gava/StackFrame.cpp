@@ -15,6 +15,10 @@ u1 StackFrame::getCode() {
 	return codes[pc];
 }
 
+u1 StackFrame::getU1() {
+	return codes[pc + 1];
+}
+
 u2 StackFrame::getU2() {
 	translate_U2 u_2;
 	u_2.U1[1] = codes[pc + 1];
@@ -40,6 +44,7 @@ bool StackFrame::hasCode() {
 void StackFrame::goto_(short shift) {
 	pc += shift;
 }
+
 void StackFrame::pushb(char value)
 {
 	stackType stack;
@@ -70,7 +75,7 @@ void StackFrame::pushi(int value)
 	stack.i = value;
 	opstack->push(stack.a);
 }
-void StackFrame::pushl(long value)
+void StackFrame::pushl(long long value)
 {
 	stackType2 stack;
 	stack.l = value;
@@ -120,7 +125,7 @@ int StackFrame::popi()
 	stack.a = opstack->pop();
 	return stack.i;
 }
-long StackFrame::popl()
+long long StackFrame::popl()
 {
 	stackType2 stack;
 	stack.U4[1] = opstack->pop();
@@ -170,7 +175,7 @@ void StackFrame::storei(u2 index, int value)
 	stack.i = value;
 	local_table->store(index, stack.a);
 }
-void StackFrame::storel(u2 index, long value)
+void StackFrame::storel(u2 index, long long value)
 {
 	stackType2 stack;
 	stack.l = value;
@@ -220,7 +225,7 @@ int StackFrame::loadi(u2 index)
 	stack.a = local_table->load(index);
 	return stack.i;
 }
-long StackFrame::loadl(u2 index)
+long long StackFrame::loadl(u2 index)
 {
 	stackType2 stack;
 	stack.U4[0] = local_table->load(index);
@@ -239,6 +244,14 @@ double StackFrame::loadd(u2 index)
 	stack.U4[0] = local_table->load(index);
 	stack.U4[1] = local_table->load(index + 1);
 	return stack.d;
+}
+
+void StackFrame::printOpStack() {
+	opstack->print();
+}
+void StackFrame::printLocals()
+{
+	local_table->print();
 }
 StackFrame::~StackFrame()
 {

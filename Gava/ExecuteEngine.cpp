@@ -14,6 +14,8 @@ void ExecuteEngine::execute() {
 	short opcode_length[] = JVM_OPCODE_LENGTH_INITIALIZER;
 	u4 null = 0;
 	while (currentFrame->hasCode()) {
+		currentFrame->printOpStack();
+		currentFrame->printLocals();
 		u1 code = currentFrame->getCode();
 		switch (code)
 		{
@@ -64,106 +66,189 @@ void ExecuteEngine::execute() {
 			currentFrame->pushf(0);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+
+
 		case fconst_1: //0x0c 	将float型1推送至栈顶
+			currentFrame->pushf(1);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case fconst_2: //0x0d 	将float型2推送至栈顶
+			currentFrame->pushf(2);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case dconst_0: //0x0e 	将do le型0推送至栈顶
+			currentFrame->pushd(0);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case dconst_1: //0x0f 	将do le型1推送至栈顶
+			currentFrame->pushd(1);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case bipush: //0x10 	将单字节的常量值(-128~127)推送至栈顶
+			currentFrame->pushb(currentFrame->getU1());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case sipush: //0x11 	将一个短整型常量值(-32768~32767)推送至栈顶
+			currentFrame->pushs(currentFrame->getU2());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case ldc: //0x12 	将int, float或String型常量值从常量池中推送至栈顶
+		{
+			int index = currentFrame->getU1()&0x000000ff;
+			switch (currentClass->constant_pools[index].tag)
+			{
+			case Tags::JVM_CONSTANT_Integer:
+				currentFrame->pusha(currentClass->constant_pools[index].integer_info.bytes);
+				break;
+			case Tags::JVM_CONSTANT_Float:
+				currentFrame->pusha(currentClass->constant_pools[index].float_info.bytes);
+				break;
+			case Tags::JVM_CONSTANT_String:
+				currentFrame->pushc(currentClass->constant_pools[index].string_info.string_index);
+				break;
+			default:
+				break;
+			}
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case ldc_w: //0x13 	将int, float或String型常量值从常量池中推送至栈顶（宽索引）
+		{
+			int index = currentFrame->getU2() & 0x0000ffff;
+			switch (currentClass->constant_pools[index].tag)
+			{
+			case Tags::JVM_CONSTANT_Integer:
+				currentFrame->pusha(currentClass->constant_pools[index].integer_info.bytes);
+				break;
+			case Tags::JVM_CONSTANT_Float:
+				currentFrame->pusha(currentClass->constant_pools[index].float_info.bytes);
+				break;
+			case Tags::JVM_CONSTANT_String:
+				currentFrame->pushc(currentClass->constant_pools[index].string_info.string_index);
+				break;
+			default:
+				break;
+			}
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case ldc2_w: //0x14 	将long或do le型常量值从常量池中推送至栈顶（宽索引）
+		{
+			int index = currentFrame->getU2() & 0x0000ffff;
+			switch (currentClass->constant_pools[index].tag)
+			{
+			case Tags::JVM_CONSTANT_Long:
+				currentFrame->pusha(currentClass->constant_pools[index].long_info.low_bytes);
+				currentFrame->pusha(currentClass->constant_pools[index].long_info.high_bytes);
+				break;
+			case Tags::JVM_CONSTANT_Double:
+				currentFrame->pusha(currentClass->constant_pools[index].double_info.low_bytes);
+				currentFrame->pusha(currentClass->constant_pools[index].double_info.high_bytes);
+				break;		
+			default:
+				break;
+			}
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case iload: //0x15 	将指定的int型本地变量
+			currentFrame->pushi(currentFrame->loadi(currentFrame->getU1()));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lload: //0x16 	将指定的long型本地变量
+			currentFrame->pushl(currentFrame->loadl(currentFrame->getU1()));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case fload: //0x17 	将指定的float型本地变量
+			currentFrame->pushf(currentFrame->loadf(currentFrame->getU1()));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case dload: //0x18 	将指定的do le型本地变量
+			currentFrame->pushd(currentFrame->loadd(currentFrame->getU1()));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case aload: //0x19 	将指定的引用类型本地变量
+			currentFrame->pusha(currentFrame->loada(currentFrame->getU1()));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iload_0: //0x1a 	将第一个int型本地变量
+			currentFrame->pushi(currentFrame->loadi(0));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iload_1: //0x1b 	将第二个int型本地变量
+			currentFrame->pushi(currentFrame->loadi(1));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iload_2: //0x1c 	将第三个int型本地变量
+			currentFrame->pushi(currentFrame->loadi(2));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iload_3: //0x1d 	将第四个int型本地变量
+			currentFrame->pushi(currentFrame->loadi(3));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lload_0: //0x1e 	将第一个long型本地变量
+			currentFrame->pushl(currentFrame->loadl(0));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lload_1: //0x1f 	将第二个long型本地变量
+			currentFrame->pushl(currentFrame->loadl(1));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lload_2: //0x20 	将第三个long型本地变量
+			currentFrame->pushl(currentFrame->loadl(2));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lload_3: //0x21 	将第四个long型本地变量
+			currentFrame->pushl(currentFrame->loadl(3));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case fload_0: //0x22 	将第一个float型本地变量
+			currentFrame->pushf(currentFrame->loadf(0));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case fload_1: //0x23 	将第二个float型本地变量
+			currentFrame->pushf(currentFrame->loadf(1));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case fload_2: //0x24 	将第三个float型本地变量
+			currentFrame->pushf(currentFrame->loadf(2));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case fload_3: //0x25 	将第四个float型本地变量
+			currentFrame->pushf(currentFrame->loadf(3));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case dload_0: //0x26 	将第一个do le型本地变量
+			currentFrame->pushd(currentFrame->loadd(0));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case dload_1: //0x27 	将第二个do le型本地变量
+			currentFrame->pushd(currentFrame->loadd(1));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case dload_2: //0x28 	将第三个do le型本地变量
+			currentFrame->pushd(currentFrame->loadd(2));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case dload_3: //0x29 	将第四个do le型本地变量
+			currentFrame->pushd(currentFrame->loadd(3));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case aload_0: //0x2a 	将第一个引用类型本地变量
+			currentFrame->pusha(currentFrame->loada(0));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case aload_1: //0x2b 	将第二个引用类型本地变量
+			currentFrame->pusha(currentFrame->loada(1));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case aload_2: //0x2c 	将第三个引用类型本地变量
+			currentFrame->pusha(currentFrame->loada(2));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case aload_3: //0x2d 	将第四个引用类型本地变量
+			currentFrame->pusha(currentFrame->loada(3));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iaload: //0x2e 	将int型数组指定索引的值推送至栈顶
@@ -191,78 +276,103 @@ void ExecuteEngine::execute() {
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case istore: //0x36 	将栈顶int型数值存入指定本地变量
+			currentFrame->storei(currentFrame->getU1(), currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lstore: //0x37 	将栈顶long型数值存入指定本地变量
+			currentFrame->storel(currentFrame->getU1(), currentFrame->popl());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case fstore: //0x38 	将栈顶float型数值存入指定本地变量
+			currentFrame->storef(currentFrame->getU1(), currentFrame->popf());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case dstore: //0x39 	将栈顶do le型数值存入指定本地变量
+			currentFrame->stored(currentFrame->getU1(), currentFrame->popd());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case astore: //0x3a 	将栈顶引用型数值存入指定本地变量
+			currentFrame->storea(currentFrame->getU1(), currentFrame->popa());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case istore_0: //0x3b 	将栈顶int型数值存入第一个本地变量
+			currentFrame->storei(0, currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case istore_1: //0x3c 	将栈顶int型数值存入第二个本地变量
+			currentFrame->storei(1, currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case istore_2: //0x3d 	将栈顶int型数值存入第三个本地变量
+			currentFrame->storei(2, currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case istore_3: //0x3e 	将栈顶int型数值存入第四个本地变量
+			currentFrame->storei(3, currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lstore_0: //0x3f 	将栈顶long型数值存入第一个本地变量
+			currentFrame->storel(0, currentFrame->popl());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lstore_1: //0x40 	将栈顶long型数值存入第二个本地变量
+			currentFrame->storel(1, currentFrame->popl());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lstore_2: //0x41 	将栈顶long型数值存入第三个本地变量
+			currentFrame->storel(2, currentFrame->popl());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lstore_3: //0x42 	将栈顶long型数值存入第四个本地变量
+			currentFrame->storel(3, currentFrame->popl());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case fstore_0: //0x43 	将栈顶float型数值存入第一个本地变量
+			currentFrame->storef(0, currentFrame->popf());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case fstore_1: //0x44 	将栈顶float型数值存入第二个本地变量
+			currentFrame->storef(1, currentFrame->popf());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case fstore_2: //0x45 	将栈顶float型数值存入第三个本地变量
+			currentFrame->storef(2, currentFrame->popf());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case fstore_3: //0x46 	将栈顶float型数值存入第四个本地变量
+			currentFrame->storef(3, currentFrame->popf());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case dstore_0: //0x47 	将栈顶do le型数值存入第一个本地变量
+			currentFrame->stored(0, currentFrame->popd());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case dstore_1: //0x48 	将栈顶do le型数值存入第二个本地变量
+			currentFrame->stored(1, currentFrame->popd());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case dstore_2: //0x49 	将栈顶do le型数值存入第三个本地变量
+			currentFrame->stored(2, currentFrame->popd());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case dstore_3: //0x4a 	将栈顶do le型数值存入第四个本地变量
+			currentFrame->stored(3, currentFrame->popd());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case astore_0: //0x4b 	将栈顶引用型数值存入第一个本地变量
+			currentFrame->storea(0, currentFrame->popa());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case astore_1: //0x4c 	将栈顶引用型数值存入第二个本地变量
+			currentFrame->storea(1, currentFrame->popa());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case astore_2: //0x4d 	将栈顶引用型数值存入第三个本地变量
+			currentFrame->storea(2, currentFrame->popa());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case astore_3: //0x4e 	将栈顶引用型数值存入第四个本地变量
+			currentFrame->storea(3, currentFrame->popa());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iastore: //0x4f 	将栈顶int型数值存入指定数组的指定索引位置
@@ -290,186 +400,354 @@ void ExecuteEngine::execute() {
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case pop: //0x57 	将栈顶数值弹出 (数值不能是long或do le类型的)
+			currentFrame->popa();
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case pop2: //0x58 	将栈顶的一个（long或do le类型的)或两个数值弹出（其它）
+			currentFrame->popl();
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case dup: //0x59 	复制栈顶数值并将复制值压入栈顶
+		{	
+			u4 a = currentFrame->popa();
+			currentFrame->pusha(a);
+			currentFrame->pusha(a);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case dup_x1: //0x5a 	复制栈顶数值并将两个复制值压入栈顶
+		{
+			u4 a = currentFrame->popa();
+			currentFrame->pusha(a);
+			currentFrame->pusha(a);
+			currentFrame->pusha(a);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case dup_x2: //0x5b 	复制栈顶数值并将三个（或两个）复制值压入栈顶
+		{
+			u4 a = currentFrame->popa();
+			currentFrame->pusha(a);
+			currentFrame->pusha(a);
+			currentFrame->pusha(a);
+			currentFrame->pusha(a);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case dup2: //0x5c 	复制栈顶一个（long或do le类型的)或两个（其它）数值并将复制值压入栈顶
+		{
+			long long a = currentFrame->popl();
+			currentFrame->pushl(a);
+			currentFrame->pushl(a);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case dup2_x1: //0x5d 	dup_x1 指令的双倍版本
+		{
+			long long a = currentFrame->popl();
+			currentFrame->pushl(a);
+			currentFrame->pushl(a);
+			currentFrame->pushl(a);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case dup2_x2: //0x5e 	dup_x2 指令的双倍版本
+		{
+			long long a = currentFrame->popl();
+			currentFrame->pushl(a);
+			currentFrame->pushl(a);
+			currentFrame->pushl(a);
+			currentFrame->pushl(a);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case swap_: //0x5f 	将栈最顶端的两个数值互换(数值不能是long或do le类型的)
+		{
+			u4 a = currentFrame->popa();
+			u4 b = currentFrame->popa();
+			currentFrame->pusha(b);
+			currentFrame->pusha(a);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case iadd: //0x60 	将栈顶两int型数值相加并将结果压入栈顶
+			currentFrame->pushi(currentFrame->popi() + currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case ladd: //0x61 	将栈顶两long型数值相加并将结果压入栈顶
+			currentFrame->pushl(currentFrame->popl() + currentFrame->popl());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case fadd: //0x62 	将栈顶两float型数值相加并将结果压入栈顶
+			currentFrame->pushf(currentFrame->popf() + currentFrame->popf());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case dadd: //0x63 	将栈顶两do le型数值相加并将结果压入栈顶
+			currentFrame->pushd(currentFrame->popd() + currentFrame->popd());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case is: //0x64 	将栈顶两int型数值相减并将结果压入栈顶
+		{
+			int b = currentFrame->popi();
+			int a = currentFrame->popi();
+			currentFrame->pushi(a - b);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case ls: //0x65 	将栈顶两long型数值相减并将结果压入栈顶
+		{
+			long long b = currentFrame->popl();
+			long long a = currentFrame->popl();
+			currentFrame->pushl(a - b);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case fs: //0x66 	将栈顶两float型数值相减并将结果压入栈顶
+		{
+			float b = currentFrame->popf();
+			float a = currentFrame->popf();
+			currentFrame->pushf(a - b);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case ds: //0x67 	将栈顶两do le型数值相减并将结果压入栈顶
+		{
+			double b = currentFrame->popd();
+			double a = currentFrame->popd();
+			currentFrame->pushd(a - b);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case imul: //0x68 	将栈顶两int型数值相乘并将结果压入栈顶
+			currentFrame->pushi(currentFrame->popi()*currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lmul: //0x69 	将栈顶两long型数值相乘并将结果压入栈顶
+			currentFrame->pushl(currentFrame->popl()*currentFrame->popl());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case fmul: //0x6a 	将栈顶两float型数值相乘并将结果压入栈顶
+			currentFrame->pushf(currentFrame->popf()*currentFrame->popf());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case dmul: //0x6b 	将栈顶两do le型数值相乘并将结果压入栈顶
+			currentFrame->pushd(currentFrame->popd()*currentFrame->popd());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case idiv: //0x6c 	将栈顶两int型数值相除并将结果压入栈顶
+		{
+			int b = currentFrame->popi();
+			int a = currentFrame->popi();
+			currentFrame->pushi(a / b);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case ldiv_: //0x6d 	将栈顶两long型数值相除并将结果压入栈顶
+		{
+			long long b = currentFrame->popl();
+			long long a = currentFrame->popl();
+			currentFrame->pushl(a / b);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case fdiv: //0x6e 	将栈顶两float型数值相除并将结果压入栈顶
+		{
+			float b = currentFrame->popf();
+			float a = currentFrame->popf();
+			currentFrame->pushf(a / b);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case ddiv: //0x6f 	将栈顶两do le型数值相除并将结果压入栈顶
+		{
+			double b = currentFrame->popd();
+			double a = currentFrame->popd();
+			currentFrame->pushd(a / b);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case irem: //0x70 	将栈顶两int型数值作取模运算并将结果压入栈顶
+		{
+			int b = currentFrame->popi();
+			int a = currentFrame->popi();
+			currentFrame->pushi(a % b);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case lrem: //0x71 	将栈顶两long型数值作取模运算并将结果压入栈顶
+		{
+			long long b = currentFrame->popl();
+			long long a = currentFrame->popl();
+			currentFrame->pushl(a % b);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case frem: //0x72 	将栈顶两float型数值作取模运算并将结果压入栈顶
+		{
+			/*float b = currentFrame->popf();
+			float a = currentFrame->popf();
+			currentFrame->pushf((int)a % (int)b);*/
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case drem: //0x73 	将栈顶两do le型数值作取模运算并将结果压入栈顶
+		{
+			/*double b = currentFrame->popd();
+			double a = currentFrame->popd();
+			currentFrame->pushd(a % b);*/
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case ineg: //0x74 	将栈顶int型数值取负并将结果压入栈顶
+			currentFrame->pushi(-currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lneg: //0x75 	将栈顶long型数值取负并将结果压入栈顶
+			currentFrame->pushl(-currentFrame->popl());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case fneg: //0x76 	将栈顶float型数值取负并将结果压入栈顶
+			currentFrame->pushf(-currentFrame->popf());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case dneg: //0x77 	将栈顶do le型数值取负并将结果压入栈顶
+			currentFrame->pushd(-currentFrame->popd());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case ishl: //0x78 	将int型数值左移位指定位数并将结果压入栈顶
+		{
+			int b = currentFrame->popi();
+			int a = currentFrame->popi();
+			currentFrame->pushi(a << b);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case lshl: //0x79 	将long型数值左移位指定位数并将结果压入栈顶
+		{
+			int b = currentFrame->popi();//b一定是int，若为long会转型为int
+			long long a = currentFrame->popl();
+			currentFrame->pushl(a << b);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case ishr: //0x7a 	将int型数值右（符号）移位指定位数并将结果压入栈顶
+		{
+			int b = currentFrame->popi();
+			int a = currentFrame->popi();
+			currentFrame->pushi(a >> b);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case lshr: //0x7b 	将long型数值右（符号）移位指定位数并将结果压入栈顶
+		{
+			int b = currentFrame->popi();//b一定是int，若为long会转型为int
+			long long a = currentFrame->popl();
+			currentFrame->pushi(a >> b);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case iushr: //0x7c 	将int型数值右（无符号）移位指定位数并将结果压入栈顶
+		{
+			int b = currentFrame->popi();
+			int a = currentFrame->popi();
+			currentFrame->pushi((u4)a >> b);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case lushr: //0x7d 	将long型数值右（无符号）移位指定位数并将结果压入栈顶
+		{
+			int b = currentFrame->popi();//b一定是int，若为long会转型为int
+			long long a = currentFrame->popl();
+			currentFrame->pushi((u4)a >> b);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case iand: //0x7e 	将栈顶两int型数值作“按位与”并将结果压入栈顶
+			currentFrame->pushi(currentFrame->popi()&currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case land: //0x7f 	将栈顶两long型数值作“按位与”并将结果压入栈顶
+			currentFrame->pushl(currentFrame->popl()&currentFrame->popl());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case ior: //0x80 	将栈顶两int型数值作“按位或”并将结果压入栈顶
+			currentFrame->pushi(currentFrame->popi()|currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lor: //0x81 	将栈顶两long型数值作“按位或”并将结果压入栈顶
+			currentFrame->pushl(currentFrame->popl() | currentFrame->popl());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case ixor: //0x82 	将栈顶两int型数值作“按位异或”并将结果压入栈顶
+			currentFrame->pushi(currentFrame->popi()^currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lxor: //0x83 	将栈顶两long型数值作“按位异或”并将结果压入栈顶
+			currentFrame->pushl(currentFrame->popl() ^ currentFrame->popl());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iinc: //0x84 	将指定int型变量增加指定值（i++, i–, i+=2）
+			currentFrame->pushi(currentFrame->popi() + 1);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case i2l: //0x85 	将栈顶int型数值强制转换成long型数值并将结果压入栈顶
+			currentFrame->pushl(currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case i2f: //0x86 	将栈顶int型数值强制转换成float型数值并将结果压入栈顶
+			currentFrame->pushf(currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case i2d: //0x87 	将栈顶int型数值强制转换成doule型数值并将结果压入栈顶
+			currentFrame->pushd(currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case l2i: //0x88 	将栈顶long型数值强制转换成int型数值并将结果压入栈顶
+			currentFrame->pushi(currentFrame->popl());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case l2f: //0x89 	将栈顶long型数值强制转换成float型数值并将结果压入栈顶
+			currentFrame->pushf(currentFrame->popl());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case l2d: //0x8a 	将栈顶long型数值强制转换成doule型数值并将结果压入栈顶
+			currentFrame->pushd(currentFrame->popl());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case f2i: //0x8b 	将栈顶float型数值强制转换成int型数值并将结果压入栈顶
+			currentFrame->pushi(currentFrame->popf());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case f2l: //0x8c 	将栈顶float型数值强制转换成long型数值并将结果压入栈顶
+			currentFrame->pushl(currentFrame->popf());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case f2d: //0x8d 	将栈顶float型数值强制转换成doule型数值并将结果压入栈顶
+			currentFrame->pushd(currentFrame->popf());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case d2i: //0x8e 	将栈顶do le型数值强制转换成int型数值并将结果压入栈顶
+			currentFrame->pushi(currentFrame->popd());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case d2l: //0x8f 	将栈顶do le型数值强制转换成long型数值并将结果压入栈顶
+			currentFrame->pushl(currentFrame->popd());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case d2f: //0x90 	将栈顶do le型数值强制转换成float型数值并将结果压入栈顶
+			currentFrame->pushf(currentFrame->popd());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case i2b: //0x91 	将栈顶int型数值强制转换成byte型数值并将结果压入栈顶
+			currentFrame->pushb(currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case i2c: //0x92 	将栈顶int型数值强制转换成char型数值并将结果压入栈顶
+			currentFrame->pushc(currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case i2s: //0x93 	将栈顶int型数值强制转换成short型数值并将结果压入栈顶
+			currentFrame->pushs(currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lcmp: //0x94 	比较栈顶两long型数值大小，并将结果（1，0，-1）压入栈顶

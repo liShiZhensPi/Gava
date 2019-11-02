@@ -9,6 +9,7 @@ public:
 	LocalTable(u2 length);
 	u4 load(u2 index);
 	void store(u2 index, u4 value);
+	void print();
 	~LocalTable();
 };
 
