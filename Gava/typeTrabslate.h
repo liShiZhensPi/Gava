@@ -3,9 +3,9 @@
 typedef union {
 	u4 a;
 	int i;
-	short s;
-	u2 c;
-	char b;
+	//short s[2];
+	//u2 c[2];
+	//char b[4];
 	float f;
 }stackType;
 

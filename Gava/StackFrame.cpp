@@ -48,19 +48,19 @@ void StackFrame::goto_(short shift) {
 void StackFrame::pushb(char value)
 {
 	stackType stack;
-	stack.b = value;
+	stack.i = value;
 	opstack->push(stack.a);
 }
 void StackFrame::pushs(short value)
 {
 	stackType stack;
-	stack.s = value;
+	stack.i = value;
 	opstack->push(stack.a);
 }
 void StackFrame::pushc(u2 value)
 {
 	stackType stack;
-	stack.c = value;
+	stack.a = value;
 	opstack->push(stack.a);
 }
 void StackFrame::pusha(u4 value)
@@ -99,19 +99,19 @@ char StackFrame::popb()
 {
 	stackType stack;
 	stack.a = opstack->pop();
-	return stack.b;
+	return stack.i;
 }
 short StackFrame::pops()
 {
 	stackType stack;
 	stack.a = opstack->pop();
-	return stack.s;
+	return stack.i;
 }
 u2 StackFrame::popc()
 {
 	stackType stack;
 	stack.a = opstack->pop();
-	return stack.c;
+	return stack.a;
 }
 u4 StackFrame::popa()
 {
@@ -148,19 +148,19 @@ double StackFrame::popd()
 void StackFrame::storeb(u2 index, char value)
 {
 	stackType stack;
-	stack.b = value;
+	stack.i = value;
 	local_table->store(index, stack.a);
 }
 void StackFrame::storec(u2 index, u2 value)
 {
 	stackType stack;
-	stack.c = value;
+	stack.a = value;
 	local_table->store(index, stack.a);
 }
 void StackFrame::stores(u2 index, short value)
 {
 	stackType stack;
-	stack.s = value;
+	stack.i = value;
 	local_table->store(index, stack.a);
 }
 void StackFrame::storea(u2 index, u4 value)
@@ -199,19 +199,19 @@ char StackFrame::loadb(u2 index)
 {
 	stackType stack;
 	stack.a = local_table->load(index);
-	return stack.b;
+	return stack.i;
 }
 short StackFrame::loads(u2 index)
 {
 	stackType stack;
 	stack.a = local_table->load(index);
-	return stack.s;
+	return stack.i;
 }
 u2 StackFrame::loadc(u2 index)
 {
 	stackType stack;
 	stack.a = local_table->load(index);
-	return stack.c;
+	return stack.a;
 }
 u4 StackFrame::loada(u2 index)
 {

@@ -8,6 +8,7 @@ ExecuteEngine::ExecuteEngine(Process *process)
 	this->currentThread = process->getMainThread();
 	this->currentClass = process->getMainClass();
 	this->currentFrame = currentThread->getStackFrame();
+	this->arrays = process->getArrays();
 }
 
 void ExecuteEngine::execute() {
@@ -252,8 +253,13 @@ void ExecuteEngine::execute() {
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iaload: //0x2e 	将int型数组指定索引的值推送至栈顶
+		{
+			int shift = currentFrame->popi();
+			u4 index = currentFrame->popa();
+			currentFrame->pushi(arrays->getArray(index)->array_date->int_array[shift]);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case laload: //0x2f 	将long型数组指定索引的值推送至栈顶
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
@@ -376,8 +382,14 @@ void ExecuteEngine::execute() {
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iastore: //0x4f 	将栈顶int型数值存入指定数组的指定索引位置
+		{
+			int value = currentFrame->popi();
+			int shift = currentFrame->popi();
+			u4 index = currentFrame->popa();
+			arrays->getArray(index)->array_date->int_array[shift] = value;
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case lastore: //0x50 	将栈顶long型数值存入指定数组的指定索引位置
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
@@ -687,9 +699,14 @@ void ExecuteEngine::execute() {
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iinc: //0x84 	将指定int型变量增加指定值（i++, i–, i+=2）
-			currentFrame->pushi(currentFrame->popi() + 1);
+		{
+			u2 a = currentFrame->getU2();
+			u1 index = a >> 8;
+			char inc = a & 0x00ff;
+			currentFrame->storei(index, currentFrame->loadi(index)+inc);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case i2l: //0x85 	将栈顶int型数值强制转换成long型数值并将结果压入栈顶
 			currentFrame->pushl(currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
@@ -751,69 +768,185 @@ void ExecuteEngine::execute() {
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case lcmp: //0x94 	比较栈顶两long型数值大小，并将结果（1，0，-1）压入栈顶
+		{
+			long long b = currentFrame->popl();
+			long long a = currentFrame->popl();
+			if (a > b)
+				currentFrame->pushi(1);
+			else if (a == b)
+				currentFrame->pushi(0);
+			else
+				currentFrame->pushi(-1);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case fcmpl: //0x95 	比较栈顶两float型数值大小，并将结果（1，0，-1）压入栈顶；当其中一个数值为NaN时，将-1压入栈顶
+		{
+			float b = currentFrame->popl();
+			float a = currentFrame->popl();
+			if (a > b)
+				currentFrame->pushi(1);
+			else if (a == b)
+				currentFrame->pushi(0);
+			else
+				currentFrame->pushi(-1);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case fcmpg: //0x96 	比较栈顶两float型数值大小，并将结果（1，0，-1）压入栈顶；当其中一个数值为NaN时，将1压入栈顶
+		{
+			float b = currentFrame->popl();
+			float a = currentFrame->popl();
+			if (a > b)
+				currentFrame->pushi(1);
+			else if (a == b)
+				currentFrame->pushi(0);
+			else
+				currentFrame->pushi(-1);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case dcmpl: //0x97 	比较栈顶两do le型数值大小，并将结果（1，0，-1）压入栈顶；当其中一个数值为NaN时，将-1压入栈顶
+		{
+			double b = currentFrame->popl();
+			double a = currentFrame->popl();
+			if (a > b)
+				currentFrame->pushi(1);
+			else if (a == b)
+				currentFrame->pushi(0);
+			else
+				currentFrame->pushi(-1);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case dcmpg: //0x98 	比较栈顶两do le型数值大小，并将结果（1，0，-1）压入栈顶；当其中一个数值为NaN时，将1压入栈顶
+		{
+			double b = currentFrame->popl();
+			double a = currentFrame->popl();
+			if (a > b)
+				currentFrame->pushi(1);
+			else if (a == b)
+				currentFrame->pushi(0);
+			else
+				currentFrame->pushi(-1);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case ifeq: //0x99 	当栈顶int型数值等于0时跳转
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			if (currentFrame->popi() == 0)
+				currentFrame->goto_(currentFrame->getU2());
+			else
+				currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case ifne: //0x9a 	当栈顶int型数值不等于0时跳转
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			if (currentFrame->popi() != 0)
+				currentFrame->goto_(currentFrame->getU2());
+			else
+				currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case iflt: //0x9b 	当栈顶int型数值小于0时跳转
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			if (currentFrame->popi() < 0)
+				currentFrame->goto_(currentFrame->getU2());
+			else
+				currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case ifge: //0x9c 	当栈顶int型数值大于等于0时跳转
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			if (currentFrame->popi() >= 0)
+				currentFrame->goto_(currentFrame->getU2());
+			else
+				currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case ifgt: //0x9d 	当栈顶int型数值大于0时跳转
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			if (currentFrame->popi() > 0)
+				currentFrame->goto_(currentFrame->getU2());
+			else
+				currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case ifle: //0x9e 	当栈顶int型数值小于等于0时跳转
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			if (currentFrame->popi() <= 0)
+				currentFrame->goto_(currentFrame->getU2());
+			else
+				currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case if_icmpeq: //0x9f 	比较栈顶两int型数值大小，当结果等于0时跳转
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+		{
+			int b = currentFrame->popi();
+			int a = currentFrame->popi();
+			if(a-b==0)
+				currentFrame->goto_(currentFrame->getU2());
+			else
+				currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case if_icmpne: //0xa0 	比较栈顶两int型数值大小，当结果不等于0时跳转
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+		{
+			int b = currentFrame->popi();
+			int a = currentFrame->popi();
+			if (a - b != 0)
+				currentFrame->goto_(currentFrame->getU2());
+			else
+				currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case if_icmplt: //0xa1 	比较栈顶两int型数值大小，当结果小于0时跳转
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+		{
+			int b = currentFrame->popi();
+			int a = currentFrame->popi();
+			if (a - b < 0)
+				currentFrame->goto_(currentFrame->getU2());
+			else
+				currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case if_icmpge: //0xa2 	比较栈顶两int型数值大小，当结果大于等于0时跳转
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+		{
+			int b = currentFrame->popi();
+			int a = currentFrame->popi();
+			if (a - b >= 0)
+				currentFrame->goto_(currentFrame->getU2());
+			else
+				currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case if_icmpgt: //0xa3 	比较栈顶两int型数值大小，当结果大于0时跳转
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+		{
+			int b = currentFrame->popi();
+			int a = currentFrame->popi();
+			if (a - b > 0)
+				currentFrame->goto_(currentFrame->getU2());
+			else
+				currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case if_icmple: //0xa4 	比较栈顶两int型数值大小，当结果小于等于0时跳转
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+		{
+			int b = currentFrame->popi();
+			int a = currentFrame->popi();
+			if (a - b <= 0)
+				currentFrame->goto_(currentFrame->getU2());
+			else
+				currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case if_acmpeq: //0xa5 	比较栈顶两引用型数值，当结果相等时跳转
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			if (currentFrame->popa() == currentFrame->popa())
+				currentFrame->goto_(currentFrame->getU2());
+			else
+				currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case if_acmpne: //0xa6 	比较栈顶两引用型数值，当结果不相等时跳转
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			if (currentFrame->popa() != currentFrame->popa())
+				currentFrame->goto_(currentFrame->getU2());
+			else
+				currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case goto_: //0xa7 	无条件跳转
+			currentFrame->goto_(currentFrame->getU2());
+			break;
+		case jsr: //0xa8 	跳转至指定16位offset位置，并将jsr下一条指令地址压入栈顶    这条指令现在可能不用了
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
-		case jsr: //0xa8 	跳转至指定16位offset位置，并将jsr下一条指令地址压入栈顶
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
-			break;
-		case ret: //0xa9 	返回至本地变量
+		case ret: //0xa9 	返回至本地变量  这条指令现在可能不用了
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case tableswitch: //0xaa 	用于switch条件跳转，case值连续（可变长度指令）
@@ -871,12 +1004,54 @@ void ExecuteEngine::execute() {
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case newarray: //0xbc 	创建一个指定原始类型（如int, float, char…）的数组，并将其引用值压入栈顶
+		{
+			u4 index = arrays->newArray();
+			gava_array* a = arrays->getArray(index);
+			char type = currentFrame->getU1();
+			u4 length = currentFrame->popa();
+			a->array_length = length;
+			switch (type) 
+			{
+			case ArrayType::JVM_T_BOOLEAN:
+				a->array_date->boolean_array = new char[length]();
+				break;
+			case ArrayType::JVM_T_BYTE:
+				a->array_date->byte_array = new char[length]();
+				break;
+			case ArrayType::JVM_T_CHAR:
+				a->array_date->char_array = new u2[length]();
+				break;
+			case ArrayType::JVM_T_DOUBLE:
+				a->array_date->double_array = new double[length]();
+				break;
+			case ArrayType::JVM_T_FLOAT:
+				a->array_date->float_array = new float[length]();
+				break;
+			case ArrayType::JVM_T_INT:
+				a->array_date->int_array = new int[length]();
+				break;
+			case ArrayType::JVM_T_LONG:
+				a->array_date->long_array = new long long[length]();
+				break;
+			case ArrayType::JVM_T_SHORT:
+				a->array_date->short_array = new short[length]();
+				break;
+			default:
+				//释放数组
+				a->array_date = NULL;
+				a->array_length = 0;
+				arrays->deleteArray(index);
+				break;
+			}
+			currentFrame->pusha(index);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case anewarray: //0xbd 	创建一个引用型（如类，接口，数组）的数组，并将其引用值压入栈顶
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case arraylength: //0xbe 	获得数组的长度值并压入栈顶
+			currentFrame->pushi(arrays->getArray(currentFrame->popa())->array_length);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case athrow: //0xbf 	将栈顶的异常抛出
@@ -901,13 +1076,19 @@ void ExecuteEngine::execute() {
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case ifnull: //0xc6 	为null时跳转
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			if (currentFrame->popa() == null)
+				currentFrame->goto_(currentFrame->getU2());
+			else
+				currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case ifnonnull: //0xc7 	不为null时跳转
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			if (currentFrame->popa() != null)
+				currentFrame->goto_(currentFrame->getU2());
+			else
+				currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case goto_w: //0xc8 	无条件跳转（宽索引）
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			currentFrame->goto_(currentFrame->getU4());
 			break;
 		case jsr_w: //0xc9    jsr_w	跳转至指定32位offset位置，并将jsr_w下一条指令地址压入栈顶
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);

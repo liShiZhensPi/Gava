@@ -57,6 +57,9 @@
     <ClInclude Include="typeTrabslate.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Arrays.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md">
@@ -90,6 +93,9 @@
     </ClCompile>
     <ClCompile Include="ExecuteEngine.cpp">
       <Filter>源文件\ExecuteEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Arrays.cpp">
+      <Filter>源文件\RuntimeDate</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

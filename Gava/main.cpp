@@ -1,8 +1,6 @@
 #include "ClassFile.h"
 #include "Process.h"
 #include"ExecuteEngine.h"
-#include <cstdlib>
-#include<cstdio>
 
 int main(int argc,char* argv[]) {
 

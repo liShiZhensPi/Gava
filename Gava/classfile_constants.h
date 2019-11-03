@@ -80,7 +80,7 @@ enum {
 
 /* Used in newarray instruction. */
 
-enum {
+enum ArrayType{
     JVM_T_BOOLEAN = 4,
     JVM_T_CHAR    = 5,
     JVM_T_FLOAT   = 6,

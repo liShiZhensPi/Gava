@@ -10,7 +10,7 @@ private:
 	Thread *currentThread;
 	StackFrame *currentFrame;
 	ClassFile *currentClass;
-
+	Arrays* arrays;
 
 public:
 	ExecuteEngine(Process *process);

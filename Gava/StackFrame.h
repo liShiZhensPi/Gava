@@ -23,7 +23,7 @@ public:
 	void goto_(short shift);
 
 
-	//8种数据类型
+	//8种数据类型  其中short 和 byte 在虚拟机中会转化为int存储；而 char（u2）会转化为引用类型（u4）存储
 	void pushb(char value);
 	void pushs(short value);
 	void pushc(u2 value);

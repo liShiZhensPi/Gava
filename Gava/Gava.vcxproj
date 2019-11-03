@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{260BB809-F6FD-4698-BFF3-F320513A152A}</ProjectGuid>
     <RootNamespace>Gava</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -41,7 +41,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -115,6 +115,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Arrays.h" />
     <ClInclude Include="ClassFile.h" />
     <ClInclude Include="classfile_constants.h" />
     <ClInclude Include="classfile_typedef.h" />
@@ -129,6 +130,7 @@
     <ClInclude Include="typeTrabslate.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Arrays.cpp" />
     <ClCompile Include="ClassFile.cpp" />
     <ClCompile Include="ExecuteEngine.cpp" />
     <ClCompile Include="Process.cpp" />
