@@ -210,11 +210,14 @@ Code_attribute* ClassFile::getMethodByNameAndType(string main_name, string main_
 	MethodInfo* method = NULL;
 	for (int i = 0; i < methods_count; i++) {
 		//class文件规范的检查在类文件加载时进行
-		char *name = constant_pools[methods[i].name_index].utf8_info.bytes;
+		/*char *name = constant_pools[methods[i].name_index].utf8_info.bytes;
 		u2 name_length = constant_pools[methods[i].name_index].utf8_info.length;
 		char *type = constant_pools[methods[i].descriptor_index].utf8_info.bytes;
-		u2 type_length = constant_pools[methods[i].descriptor_index].utf8_info.length;
-		if (constant_utf8_equal(name,name_length,main_name) == 0 && constant_utf8_equal(type,type_length,main_type) == 0) {
+		u2 type_length = constant_pools[methods[i].descriptor_index].utf8_info.length;*/
+
+		string name(constant_pools[methods[i].name_index].utf8_info.bytes, constant_pools[methods[i].name_index].utf8_info.length);
+		string type(constant_pools[methods[i].descriptor_index].utf8_info.bytes, constant_pools[methods[i].descriptor_index].utf8_info.length);
+		if (name.compare(main_name)==0&&type.compare(main_type)==0) {
 			method = &methods[i];
 			break;
 		}
@@ -226,9 +229,10 @@ Code_attribute* ClassFile::getMethodByNameAndType(string main_name, string main_
 	
 	char *info = NULL;
 	for (int i = 0; i < method->attributes_count; i++) {
-		char *name = constant_pools[method->attributes[i].attribute_name_index].utf8_info.bytes;
-		u2 name_length = constant_pools[method->attributes[i].attribute_name_index].utf8_info.length;
-		if ( constant_utf8_equal(name,name_length,"Code")== 0) {
+		/*char *name = constant_pools[method->attributes[i].attribute_name_index].utf8_info.bytes;
+		u2 name_length = constant_pools[method->attributes[i].attribute_name_index].utf8_info.length;*/
+		string name(constant_pools[method->attributes[i].attribute_name_index].utf8_info.bytes, constant_pools[method->attributes[i].attribute_name_index].utf8_info.length);
+		if ( name.compare("Code")== 0) {
 			info = method->attributes[i].info;
 			break;
 		}
@@ -266,11 +270,11 @@ void ClassFile::setField(string name, fieldType value)
 	static_fields[name] = value;
 }
 
-int ClassFile::constant_utf8_equal(char *s, u2 length,string str) {
-	if (length != str.length())
-		return -1;
-	for (int i = 0; i < length; i++)
-		if (s[i] != str.data()[i])
-			return -1;
-	return 0;
-}
+//int ClassFile::constant_utf8_equal(char *s, u2 length,string str) {
+//	if (length != str.length())
+//		return -1;
+//	for (int i = 0; i < length; i++)
+//		if (s[i] != str.data()[i])
+//			return -1;
+//	return 0;
+//}
