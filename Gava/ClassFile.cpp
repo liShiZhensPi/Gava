@@ -160,6 +160,19 @@ void ClassFile::parseAttributes() {
 	}
 }
 
+void ClassFile::init_static_fields()
+{
+
+	for (int i = 0; i < fields_count; i++) {
+		if ((fields[i].access_flags & Flags::JVM_ACC_STATIC) == 1&&(fields[i].access_flags & Flags::JVM_ACC_FINAL)==0) {
+			string name = constant_pools[fields[i].name_index].utf8_info.bytes;//获取属性的name
+			fieldType a;
+			a.l = 0;//初始化为0   float和double暂不考虑
+			static_fields.insert(pair<string, fieldType>(name, a));
+		}
+	}
+}
+
 u1 ClassFile::getU1() {
 	char b1;
 	f.read(&b1, sizeof(char));
@@ -231,6 +244,26 @@ Code_attribute* ClassFile::getMethodByNameAndType(string main_name, string main_
 	code->code_length = (((u2)info[4] << 24) & 0xff000000) | (((u2)info[5] << 16) & 0x00ff0000) | (((u2)info[6] << 8) & 0x0000ff00) | (((u2)info[7]) & 0x000000ff);
 	code->codes = &info[8];//info[8~8+code_length]为代码
 	return code;
+}
+
+fieldType ClassFile::getField(string name)
+{
+	if (static_fields.find(name) == static_fields.end())
+	{
+		cout << "can't find field" << endl;
+		exit(-1);
+	}
+	return static_fields[name];
+}
+
+void ClassFile::setField(string name, fieldType value)
+{
+	if (static_fields.find(name) == static_fields.end())
+	{
+		cout << "can't find field" << endl;
+		exit(-1);
+	}
+	static_fields[name] = value;
 }
 
 int ClassFile::constant_utf8_equal(char *s, u2 length,string str) {

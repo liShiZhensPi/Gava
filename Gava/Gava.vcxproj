@@ -85,6 +85,9 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -119,6 +122,7 @@
     <ClInclude Include="ClassFile.h" />
     <ClInclude Include="classfile_constants.h" />
     <ClInclude Include="classfile_typedef.h" />
+    <ClInclude Include="error_exit.h" />
     <ClInclude Include="ExecuteEngine.h" />
     <ClInclude Include="Opcodes.h" />
     <ClInclude Include="Process.h" />
@@ -143,6 +147,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="test.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

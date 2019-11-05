@@ -4,16 +4,6 @@
 #include<cstdlib>
 #include<iostream>
 using namespace std;
-typedef union {
-	char* boolean_array;
-	u2* char_array;
-	float* float_array;
-	double* double_array;
-	char* byte_array;
-	short* short_array;
-	int* int_array;
-	long long* long_array;
-}arrayType;
 
 typedef struct {
 	arrayType* array_date = NULL;

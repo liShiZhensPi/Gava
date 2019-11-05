@@ -94,3 +94,27 @@ typedef struct {
 }Code_attribute;
 
 
+typedef union {
+	char* boolean_array;
+	u2* char_array;
+	float* float_array;
+	double* double_array;
+	char* byte_array;
+	short* short_array;
+	int* int_array;
+	long long* long_array;
+}arrayType;
+
+typedef union {
+	char b;
+	short s;
+	u2 c;
+	int i;
+	u4 a;
+	float f;
+	long long l;
+	double d;
+}fieldType;
+
+
+

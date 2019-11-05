@@ -2,13 +2,16 @@
 
 
 
-StackFrame::StackFrame(u4 code_length,char *codes,u2 max_stack,u2 max_locals)
+StackFrame::StackFrame(ClassFile *classFile,string method_name,string method_descriptor)
 {
+
 	pc = 0;
-	this->code_length = code_length;
-	this->codes = codes;
-	this->opstack = new OpStack(max_stack);
-	this->local_table = new LocalTable(max_locals);
+	Code_attribute*  code = classFile->getMethodByNameAndType(method_name, method_descriptor);
+	this->classFile = classFile;
+	this->code_length = code->code_length;
+	this->codes = code->codes;
+	this->opstack = new OpStack(code->max_stack);
+	this->local_table = new LocalTable(code->max_locals);
 }
 
 u1 StackFrame::getCode() {

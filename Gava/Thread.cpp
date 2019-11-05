@@ -2,10 +2,11 @@
 
 
 
-Thread::Thread(string name,Code_attribute *code)
+Thread::Thread(ClassFile* classFile,string name)
 {
 	this->name = name;
-	VMStack.push(new StackFrame(code->code_length, code->codes, code->max_stack, code->max_locals));
+
+	VMStack.push(new StackFrame(classFile, "main", "([Ljava/lang/String;)V"));
 }
 
 StackFrame* Thread::getStackFrame() {

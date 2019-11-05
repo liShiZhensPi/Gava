@@ -6,7 +6,7 @@ ExecuteEngine::ExecuteEngine(Process *process)
 {
 	this->currentProcess = process;
 	this->currentThread = process->getMainThread();
-	this->currentClass = process->getMainClass();
+	//this->currentClass = process->getMainClass();
 	this->currentFrame = currentThread->getStackFrame();
 	this->arrays = process->getArrays();
 }
@@ -96,16 +96,16 @@ void ExecuteEngine::execute() {
 		case ldc: //0x12 	将int, float或String型常量值从常量池中推送至栈顶
 		{
 			int index = currentFrame->getU1()&0x000000ff;
-			switch (currentClass->constant_pools[index].tag)
+			switch (currentFrame->classFile->constant_pools[index].tag)
 			{
 			case Tags::JVM_CONSTANT_Integer:
-				currentFrame->pusha(currentClass->constant_pools[index].integer_info.bytes);
+				currentFrame->pusha(currentFrame->classFile->constant_pools[index].integer_info.bytes);
 				break;
 			case Tags::JVM_CONSTANT_Float:
-				currentFrame->pusha(currentClass->constant_pools[index].float_info.bytes);
+				currentFrame->pusha(currentFrame->classFile->constant_pools[index].float_info.bytes);
 				break;
 			case Tags::JVM_CONSTANT_String:
-				currentFrame->pushc(currentClass->constant_pools[index].string_info.string_index);
+				currentFrame->pushc(currentFrame->classFile->constant_pools[index].string_info.string_index);
 				break;
 			default:
 				break;
@@ -116,16 +116,16 @@ void ExecuteEngine::execute() {
 		case ldc_w: //0x13 	将int, float或String型常量值从常量池中推送至栈顶（宽索引）
 		{
 			int index = currentFrame->getU2() & 0x0000ffff;
-			switch (currentClass->constant_pools[index].tag)
+			switch (currentFrame->classFile->constant_pools[index].tag)
 			{
 			case Tags::JVM_CONSTANT_Integer:
-				currentFrame->pusha(currentClass->constant_pools[index].integer_info.bytes);
+				currentFrame->pusha(currentFrame->classFile->constant_pools[index].integer_info.bytes);
 				break;
 			case Tags::JVM_CONSTANT_Float:
-				currentFrame->pusha(currentClass->constant_pools[index].float_info.bytes);
+				currentFrame->pusha(currentFrame->classFile->constant_pools[index].float_info.bytes);
 				break;
 			case Tags::JVM_CONSTANT_String:
-				currentFrame->pushc(currentClass->constant_pools[index].string_info.string_index);
+				currentFrame->pushc(currentFrame->classFile->constant_pools[index].string_info.string_index);
 				break;
 			default:
 				break;
@@ -136,15 +136,15 @@ void ExecuteEngine::execute() {
 		case ldc2_w: //0x14 	将long或do le型常量值从常量池中推送至栈顶（宽索引）
 		{
 			int index = currentFrame->getU2() & 0x0000ffff;
-			switch (currentClass->constant_pools[index].tag)
+			switch (currentFrame->classFile->constant_pools[index].tag)
 			{
 			case Tags::JVM_CONSTANT_Long:
-				currentFrame->pusha(currentClass->constant_pools[index].long_info.low_bytes);
-				currentFrame->pusha(currentClass->constant_pools[index].long_info.high_bytes);
+				currentFrame->pusha(currentFrame->classFile->constant_pools[index].long_info.low_bytes);
+				currentFrame->pusha(currentFrame->classFile->constant_pools[index].long_info.high_bytes);
 				break;
 			case Tags::JVM_CONSTANT_Double:
-				currentFrame->pusha(currentClass->constant_pools[index].double_info.low_bytes);
-				currentFrame->pusha(currentClass->constant_pools[index].double_info.high_bytes);
+				currentFrame->pusha(currentFrame->classFile->constant_pools[index].double_info.low_bytes);
+				currentFrame->pusha(currentFrame->classFile->constant_pools[index].double_info.high_bytes);
 				break;		
 			default:
 				break;
@@ -956,23 +956,70 @@ void ExecuteEngine::execute() {
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case ireturn: //0xac 	从当前方法返回int
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+		{
+			if (currentThread->VMStack.empty())
+				exit(currentFrame->popi());
+			StackFrame* back_frame = currentThread->VMStack.top();
+			currentThread->VMStack.pop();
+			back_frame->pushi(currentFrame->popi());
+			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);//似乎这是一条没用的语句
+			currentFrame = back_frame;
 			break;
+		}
 		case lreturn: //0xad 	从当前方法返回long
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+		{
+			if (currentThread->VMStack.empty())
+				exit(currentFrame->popl());
+			StackFrame* back_frame = currentThread->VMStack.top();
+			currentThread->VMStack.pop();
+			back_frame->pushl(currentFrame->popl());
+			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);//似乎这是一条没用的语句
+			currentFrame = back_frame;
 			break;
+		}
 		case freturn: //0xae 	从当前方法返回float
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+		{
+			if (currentThread->VMStack.empty())
+				exit(currentFrame->popf());
+			StackFrame* back_frame = currentThread->VMStack.top();
+			currentThread->VMStack.pop();
+			back_frame->pushf(currentFrame->popf());
+			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);//似乎这是一条没用的语句
+			currentFrame = back_frame;
 			break;
+		}
 		case dreturn: //0xaf 	从当前方法返回do le
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+		{
+			if (currentThread->VMStack.empty())
+				exit(currentFrame->popd());
+			StackFrame* back_frame = currentThread->VMStack.top();
+			currentThread->VMStack.pop();
+			back_frame->pushd(currentFrame->popd());
+			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);//似乎这是一条没用的语句
+			currentFrame = back_frame;
 			break;
+		}
 		case areturn: //0xb0 	从当前方法返回对象引用
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+		{
+			if (currentThread->VMStack.empty())
+				exit(currentFrame->popa());
+			StackFrame* back_frame = currentThread->VMStack.top();
+			currentThread->VMStack.pop();
+			back_frame->pusha(currentFrame->popa());
+			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);//似乎这是一条没用的语句
+			currentFrame = back_frame;
 			break;
+		}
 		case return_: //0xb1 	从当前方法返回void
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+		{
+			if (currentThread->VMStack.empty())
+				exit(0);
+			StackFrame* back_frame = currentThread->VMStack.top();
+			currentThread->VMStack.pop();
+			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);//似乎这是一条没用的语句
+			currentFrame = back_frame;
 			break;
+		}
 		case getstatic: //0xb2 	获取指定类的静态域，并将其值压入栈顶
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
@@ -989,11 +1036,108 @@ void ExecuteEngine::execute() {
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case invokespecial: //0xb7 	调用超类构造方法，实例初始化方法，私有方法
+		{
+			u2 index= currentFrame->getU2();
+			
+			u2 class_index = currentFrame->classFile->constant_pools[index].methodref_info.class_index;
+			u2 name_type_index = currentFrame->classFile->constant_pools[index].methodref_info.name_and_type_index;
+			
+			u2 utf8_class_index = currentFrame->classFile->constant_pools[class_index].class_info.name_index;
+			u2 utf8_name_index = currentFrame->classFile->constant_pools[name_type_index].nameAndType_info.name_index;
+			u2 utf8_type_index = currentFrame->classFile->constant_pools[name_type_index].nameAndType_info.descriptor_index;
+
+			string class_name(currentFrame->classFile->constant_pools[utf8_class_index].utf8_info.bytes);
+			string method_name(currentFrame->classFile->constant_pools[utf8_name_index].utf8_info.bytes);
+			string method_descriptor(currentFrame->classFile->constant_pools[utf8_type_index].utf8_info.bytes);
+			StackFrame  *new_frame = new StackFrame(currentProcess->getClassFile(class_name), method_name, method_descriptor);
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case invokestatic: //0xb8 	调用静态方法
+		{
+			u2 index = currentFrame->getU2();
+
+			u2 class_index = currentFrame->classFile->constant_pools[index].methodref_info.class_index;
+			u2 name_type_index = currentFrame->classFile->constant_pools[index].methodref_info.name_and_type_index;
+
+			u2 utf8_class_index = currentFrame->classFile->constant_pools[class_index].class_info.name_index;
+			u2 utf8_name_index = currentFrame->classFile->constant_pools[name_type_index].nameAndType_info.name_index;
+			u2 utf8_type_index = currentFrame->classFile->constant_pools[name_type_index].nameAndType_info.descriptor_index;
+
+			string class_name(currentFrame->classFile->constant_pools[utf8_class_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_class_index].utf8_info.length);
+			string method_name(currentFrame->classFile->constant_pools[utf8_name_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_name_index].utf8_info.length);
+			string method_descriptor(currentFrame->classFile->constant_pools[utf8_type_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_type_index].utf8_info.length);
+			StackFrame* new_frame = new StackFrame(currentProcess->getClassFile(class_name), method_name, method_descriptor);
+			stack<char> args;
+			for (int i = 0; i < method_descriptor.length(); i++) {//解析参数列表
+				if (method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_FUNC)
+					continue;
+				else if (method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_ARRAY || method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_CLASS) {
+					args.push(method_descriptor.data()[i]);
+					do {
+						i++;
+					} while (method_descriptor.data()[i] != Descriptor::JVM_SIGNATURE_ENDCLASS);
+				}
+				else if (method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_DOUBLE || method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_LONG) {
+					args.push(method_descriptor.data()[i]);
+					args.push(method_descriptor.data()[i]);
+				}
+				else if (method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_ENDFUNC)
+					break;
+				else
+					args.push(method_descriptor.data()[i]);
+			}
+			while (!args.empty()) {
+				switch (args.top())
+				{
+				case Descriptor::JVM_SIGNATURE_ARRAY:
+					new_frame->storea(args.size()-1,currentFrame->popa());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_BOOLEAN:
+					new_frame->storeb(args.size() - 1, currentFrame->popb());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_BYTE:
+					new_frame->storeb(args.size() - 1, currentFrame->popb());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_CHAR:
+					new_frame->storec(args.size() - 1, currentFrame->popc());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_DOUBLE:
+					new_frame->stored(args.size() - 2, currentFrame->popd());
+					args.pop();
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_FLOAT:
+					new_frame->storef(args.size() - 1, currentFrame->popf());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_INT:
+					new_frame->storei(args.size() - 1, currentFrame->popi());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_LONG:
+					new_frame->storel(args.size() - 2, currentFrame->popl());
+					args.pop();
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_SHORT:
+					new_frame->stores(args.size() - 1, currentFrame->pops());
+					args.pop();
+					break;
+				default:
+					exit_with_massage("未知的参数类型 : " + args.top());
+				}
+			}
+
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			currentThread->VMStack.push(currentFrame);
+			currentFrame = new_frame;
 			break;
+		}
 		case invokeinterface: //0xb9 	调用接口方法
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;

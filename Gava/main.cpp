@@ -10,7 +10,7 @@ int main(int argc,char* argv[]) {
 	}
 
 	ClassFile *file = new ClassFile(argv[1]);
-	Process *process = new Process("Test.class", file);
+	Process *process = new Process("Test/Test", file);
 	ExecuteEngine *engine = new ExecuteEngine(process);
 	engine->execute();
 	getchar();

@@ -60,6 +60,9 @@
     <ClInclude Include="Arrays.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="error_exit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md">
@@ -97,5 +100,10 @@
     <ClCompile Include="Arrays.cpp">
       <Filter>源文件\RuntimeDate</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="test.txt">
+      <Filter>资源文件</Filter>
+    </Text>
   </ItemGroup>
 </Project>

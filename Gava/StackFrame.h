@@ -12,7 +12,8 @@ private:
 	OpStack *opstack;
 	LocalTable *local_table;
 public:
-	StackFrame(u4 code_length,char *codes,u2 max_stack,u2 max_locals);
+	ClassFile* classFile;
+	StackFrame(ClassFile *classFile,string method_name,string method_dexcriptor);
 	void printOpStack();
 	void printLocals();
 	u1 getCode();

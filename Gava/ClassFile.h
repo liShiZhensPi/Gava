@@ -2,8 +2,10 @@
 #include<cstring>
 #include<iostream>
 #include<fstream>
+#include<map>
 #include"classfile_typedef.h"
 #include"classfile_constants.h"
+
 using namespace std;
 
 
@@ -27,12 +29,15 @@ public:
 	u2 attributes_count;
 	AttributeInfo* attributes;
 
-
 	ClassFile(string filename);
 	int constant_utf8_equal(char* s, u2 length, string str);
 	Code_attribute* getMethodByNameAndType(string name,string type);
+	fieldType getField(string name);
+	void setField(string name, fieldType value);
 	~ClassFile();
 private:
+	map<string, fieldType> static_fields;
+	void init_static_fields();
 	fstream f;
 	u1 getU1();
 	u2 getU2();

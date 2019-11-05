@@ -1,0 +1,60 @@
+// class version 56.0 (56)
+// access flags 0x21
+public class Test/Test {
+
+  // compiled from: Test.java
+
+  // access flags 0x1
+  public <init>()V
+   L0
+    LINENUMBER 3 L0
+    ALOAD 0
+    INVOKESPECIAL java/lang/Object.<init> ()V
+    RETURN
+   L1
+    LOCALVARIABLE this LTest/Test; L0 L1 0
+    MAXSTACK = 1
+    MAXLOCALS = 1
+
+  // access flags 0xA
+  private static add(ZI)I
+   L0
+    LINENUMBER 9 L0
+    ILOAD 0
+    IFEQ L1
+   L2
+    LINENUMBER 10 L2
+    ILOAD 1
+    ICONST_2
+    IMUL
+    IRETURN
+   L1
+    LINENUMBER 12 L1
+   FRAME SAME
+    ILOAD 1
+    ICONST_1
+    IADD
+    IRETURN
+   L3
+    LOCALVARIABLE a1 Z L0 L3 0
+    LOCALVARIABLE b2 I L0 L3 1
+    MAXSTACK = 2
+    MAXLOCALS = 2
+
+  // access flags 0x9
+  public static main([Ljava/lang/String;)V
+   L0
+    LINENUMBER 16 L0
+    ICONST_1
+    BIPUSH 14
+    INVOKESTATIC Test/Test.add (ZI)I
+    ISTORE 1
+   L1
+    LINENUMBER 17 L1
+    RETURN
+   L2
+    LOCALVARIABLE args [Ljava/lang/String; L0 L2 0
+    LOCALVARIABLE c I L1 L2 1
+    MAXSTACK = 2
+    MAXLOCALS = 2
+}
