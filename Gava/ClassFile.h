@@ -5,6 +5,7 @@
 #include<map>
 #include"classfile_typedef.h"
 #include"classfile_constants.h"
+#include"error_exit.h"
 
 using namespace std;
 

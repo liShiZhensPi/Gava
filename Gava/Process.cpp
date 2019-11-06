@@ -13,7 +13,9 @@ Process::Process(string mainClass,ClassFile *main)
 ClassFile* Process::getClassFile(string name) 
 {
 	if (classFiles.find(name) == classFiles.end())//在此处实现类的加载
-		exit_with_massage("找不到指定类: "+name);
+	{
+		classFiles.insert(pair<string, ClassFile*>(name, new ClassFile(name)));
+	}
 	return classFiles.at(name);
 }
 
@@ -45,15 +47,15 @@ Instance* Process::getInstance(u4 index)
 	return instances.at(index);
 }
 
-u4 Process::newInstance(ClassFile* class_file)
+u4 Process::newInstance(string class_name,ClassFile* class_file)
 {
 	if (!unused_instances.empty()) {
 		u4 index = unused_instances.top();
 		unused_instances.pop();
-		instances.at(index) = new Instance(class_file);
+		instances.at(index) = new Instance(class_name,class_file);
 		return index;
 	}
-	instances.push_back(new Instance(class_file));
+	instances.push_back(new Instance(class_name,class_file));
 	return instances.size()-1;
 }
 

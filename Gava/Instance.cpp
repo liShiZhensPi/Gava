@@ -2,12 +2,13 @@
 
 
 
-Instance::Instance(ClassFile* class_file)
+Instance::Instance(string class_name,ClassFile* class_file)
 {
 	this->class_file = class_file;
+	this->class_name = class_name;
 	for (int i = 0; i < class_file->fields_count; i++) {
 		if ((class_file->fields[i].access_flags & Flags::JVM_ACC_STATIC) == 0) {
-			string name = class_file->constant_pools[class_file->fields[i].name_index].utf8_info.bytes;//获取属性的name
+			string name (class_file->constant_pools[class_file->fields[i].name_index].utf8_info.bytes, class_file->constant_pools[class_file->fields[i].name_index].utf8_info.length);//获取属性的name
 			fieldType a;
 			a.l = 0;//初始化为0   float和double暂不考虑
 			fields.insert(pair<string,fieldType>(name,a));

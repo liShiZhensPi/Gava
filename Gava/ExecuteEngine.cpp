@@ -1021,36 +1021,541 @@ void ExecuteEngine::execute() {
 			break;
 		}
 		case getstatic: //0xb2 	获取指定类的静态域，并将其值压入栈顶
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
-			break;
-		case putstatic: //0xb3 	为指定的类的静态域赋值
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
-			break;
-		case getfield: //0xb4 	获取指定类的实例域，并将其值压入栈顶
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
-			break;
-		case putfield: //0xb5 	为指定的类的实例域赋值
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
-			break;
-		case invokevirtual: //0xb6 	调用实例方法
-			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
-			break;
-		case invokespecial: //0xb7 	调用超类构造方法，实例初始化方法，私有方法
 		{
-			u2 index= currentFrame->getU2();
+			u2 field_index = currentFrame->getU2();
+			u2 class_index = currentFrame->classFile->constant_pools[field_index].fieldref_info.class_index;
+			u2 name_type_index = currentFrame->classFile->constant_pools[field_index].fieldref_info.name_and_type_index;
+			u2 class_name_index = currentFrame->classFile->constant_pools[class_index].class_info.name_index;
+			u2 field_name_index = currentFrame->classFile->constant_pools[name_type_index].nameAndType_info.name_index;
+			u2 field_type_index = currentFrame->classFile->constant_pools[name_type_index].nameAndType_info.descriptor_index;
+
+			string class_name(currentFrame->classFile->constant_pools[class_name_index].utf8_info.bytes, currentFrame->classFile->constant_pools[class_name_index].utf8_info.length);
+			string field_name(currentFrame->classFile->constant_pools[field_name_index].utf8_info.bytes, currentFrame->classFile->constant_pools[field_name_index].utf8_info.length);
+			string field_type(currentFrame->classFile->constant_pools[field_type_index].utf8_info.bytes, currentFrame->classFile->constant_pools[field_type_index].utf8_info.length);
+
+			switch (field_type.data()[0]) {
+			case Descriptor::JVM_SIGNATURE_ARRAY:
+			case Descriptor::JVM_SIGNATURE_CLASS:
+			{
+				ClassFile* class_file = currentProcess->getClassFile(class_name);
+				currentFrame->pusha(class_file->getField(field_name).a);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_BOOLEAN:
+			case Descriptor::JVM_SIGNATURE_BYTE:
+			{
+				ClassFile* class_file = currentProcess->getClassFile(class_name);
+				currentFrame->pushb(class_file->getField(field_name).b);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_CHAR:
+			{
+				ClassFile* class_file = currentProcess->getClassFile(class_name);
+				currentFrame->pushc(class_file->getField(field_name).c);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_DOUBLE:
+			{
+				ClassFile* class_file = currentProcess->getClassFile(class_name);
+				currentFrame->pushd(class_file->getField(field_name).d);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_FLOAT:
+			{
+				ClassFile* class_file = currentProcess->getClassFile(class_name);
+				currentFrame->pushf(class_file->getField(field_name).f);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_INT:
+			{
+				ClassFile* class_file = currentProcess->getClassFile(class_name);
+				currentFrame->pushi(class_file->getField(field_name).i);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_LONG:
+			{
+				ClassFile* class_file = currentProcess->getClassFile(class_name);
+				currentFrame->pushl(class_file->getField(field_name).l);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_SHORT:
+			{
+				ClassFile* class_file = currentProcess->getClassFile(class_name);
+				currentFrame->pushs(class_file->getField(field_name).s);
+				break;
+			}
+			default:
+				exit_with_massage("unkonw field type: " + field_type.data()[0]);
+			}
+			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			break;
+		}
+		case putstatic: //0xb3 	为指定的类的静态域赋值
+		{
+			u2 field_index = currentFrame->getU2();
+			u2 class_index = currentFrame->classFile->constant_pools[field_index].fieldref_info.class_index;
+			u2 name_type_index = currentFrame->classFile->constant_pools[field_index].fieldref_info.name_and_type_index;
+			u2 class_name_index = currentFrame->classFile->constant_pools[class_index].class_info.name_index;
+			u2 field_name_index = currentFrame->classFile->constant_pools[name_type_index].nameAndType_info.name_index;
+			u2 field_type_index = currentFrame->classFile->constant_pools[name_type_index].nameAndType_info.descriptor_index;
+
+			string class_name(currentFrame->classFile->constant_pools[class_name_index].utf8_info.bytes, currentFrame->classFile->constant_pools[class_name_index].utf8_info.length);
+			string field_name(currentFrame->classFile->constant_pools[field_name_index].utf8_info.bytes, currentFrame->classFile->constant_pools[field_name_index].utf8_info.length);
+			string field_type(currentFrame->classFile->constant_pools[field_type_index].utf8_info.bytes, currentFrame->classFile->constant_pools[field_type_index].utf8_info.length);
 			
+			switch (field_type.data()[0]) {
+			case Descriptor::JVM_SIGNATURE_ARRAY:
+			case Descriptor::JVM_SIGNATURE_CLASS:
+			{
+				ClassFile* class_file = currentProcess->getClassFile(class_name);
+				fieldType field_value;
+				field_value.a = currentFrame->popa();
+				class_file->setField(field_name, field_value);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_BOOLEAN:
+			case Descriptor::JVM_SIGNATURE_BYTE:
+			{
+				ClassFile* class_file = currentProcess->getClassFile(class_name);
+				fieldType field_value;
+				field_value.b = currentFrame->popb();
+				class_file->setField(field_name, field_value);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_CHAR:
+			{
+				ClassFile* class_file = currentProcess->getClassFile(class_name);
+				fieldType field_value;
+				field_value.c = currentFrame->popc();
+				class_file->setField(field_name, field_value);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_DOUBLE:
+			{
+				ClassFile* class_file = currentProcess->getClassFile(class_name);
+				fieldType field_value;
+				field_value.d = currentFrame->popd();
+				class_file->setField(field_name, field_value);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_FLOAT:
+			{
+				ClassFile* class_file = currentProcess->getClassFile(class_name);
+				fieldType field_value;
+				field_value.f = currentFrame->popf();
+				class_file->setField(field_name, field_value);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_INT:
+			{
+				ClassFile* class_file = currentProcess->getClassFile(class_name);
+				fieldType field_value;
+				field_value.i = currentFrame->popi();
+				class_file->setField(field_name, field_value);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_LONG:
+			{
+				ClassFile* class_file = currentProcess->getClassFile(class_name);
+				fieldType field_value;
+				field_value.l = currentFrame->popl();
+				class_file->setField(field_name, field_value);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_SHORT:
+			{
+				ClassFile* class_file = currentProcess->getClassFile(class_name);
+				fieldType field_value;
+				field_value.s = currentFrame->pops();
+				class_file->setField(field_name, field_value);
+				break;
+			}
+			default:
+				exit_with_massage("unkonw field type: " + field_type.data()[0]);
+			}
+			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			break;
+		}
+		case getfield: //0xb4 	获取指定类的实例域，并将其值压入栈顶
+		{
+			u2 field_index = currentFrame->getU2();
+			u2 class_index = currentFrame->classFile->constant_pools[field_index].fieldref_info.class_index;
+			u2 name_type_index = currentFrame->classFile->constant_pools[field_index].fieldref_info.name_and_type_index;
+			u2 class_name_index = currentFrame->classFile->constant_pools[class_index].class_info.name_index;
+			u2 field_name_index = currentFrame->classFile->constant_pools[name_type_index].nameAndType_info.name_index;
+			u2 field_type_index = currentFrame->classFile->constant_pools[name_type_index].nameAndType_info.descriptor_index;
+
+			string class_name(currentFrame->classFile->constant_pools[class_name_index].utf8_info.bytes, currentFrame->classFile->constant_pools[class_name_index].utf8_info.length);
+			string field_name(currentFrame->classFile->constant_pools[field_name_index].utf8_info.bytes, currentFrame->classFile->constant_pools[field_name_index].utf8_info.length);
+			string field_type(currentFrame->classFile->constant_pools[field_type_index].utf8_info.bytes, currentFrame->classFile->constant_pools[field_type_index].utf8_info.length);
+			switch (field_type.data()[0]) {
+			case Descriptor::JVM_SIGNATURE_ARRAY:
+			case Descriptor::JVM_SIGNATURE_CLASS:
+			{
+				u4 instance_index = currentFrame->popa();
+				Instance* instance = currentProcess->getInstance(instance_index);
+				if (instance->class_name.compare(class_name) != 0)
+					exit_with_massage(instance_index + " 实例 : 不是指定类型。");
+				currentFrame->pusha(instance->getField(field_name).a);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_BOOLEAN:
+			case Descriptor::JVM_SIGNATURE_BYTE:
+			{
+				char instance_index = currentFrame->popb();
+				Instance* instance = currentProcess->getInstance(instance_index);
+				if (instance->class_name.compare(class_name) != 0)
+					exit_with_massage(instance_index + " 实例 : 不是指定类型。");
+				currentFrame->pushb(instance->getField(field_name).b);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_CHAR:
+			{
+				u2 instance_index = currentFrame->popc();
+				Instance* instance = currentProcess->getInstance(instance_index);
+				if (instance->class_name.compare(class_name) != 0)
+					exit_with_massage(instance_index + " 实例 : 不是指定类型。");
+				currentFrame->pushc(instance->getField(field_name).c);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_DOUBLE:
+			{
+				double instance_index = currentFrame->popd();
+				Instance* instance = currentProcess->getInstance(instance_index);
+				if (instance->class_name.compare(class_name) != 0)
+					exit_with_massage("实例不是指定类型");
+				currentFrame->pushd(instance->getField(field_name).d);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_FLOAT:
+			{
+				float instance_index = currentFrame->popf();
+				Instance* instance = currentProcess->getInstance(instance_index);
+				if (instance->class_name.compare(class_name) != 0)
+					exit_with_massage("实例不是指定类型");
+				currentFrame->pushf(instance->getField(field_name).f);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_INT:
+			{
+				int instance_index = currentFrame->popi();
+				Instance* instance = currentProcess->getInstance(instance_index);
+				if (instance->class_name.compare(class_name) != 0)
+					exit_with_massage("实例不是指定类型");
+				currentFrame->pushi(instance->getField(field_name).i);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_LONG:
+			{
+				long long instance_index = currentFrame->popl();
+				Instance* instance = currentProcess->getInstance(instance_index);
+				if (instance->class_name.compare(class_name) != 0)
+					exit_with_massage("实例不是指定类型");
+				currentFrame->pushl(instance->getField(field_name).l);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_SHORT:
+			{
+				short instance_index = currentFrame->pops();
+				Instance* instance = currentProcess->getInstance(instance_index);
+				if (instance->class_name.compare(class_name) != 0)
+					exit_with_massage("实例不是指定类型");
+				currentFrame->pushs(instance->getField(field_name).s);
+				break;
+			}
+			default:
+				exit_with_massage("unkonw field type: " + field_type.data()[0]);
+			}
+			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			break;
+		}
+		case putfield: //0xb5 	为指定的类的实例域赋值
+		{
+			u2 field_index = currentFrame->getU2();
+			u2 class_index = currentFrame->classFile->constant_pools[field_index].fieldref_info.class_index;
+			u2 name_type_index = currentFrame->classFile->constant_pools[field_index].fieldref_info.name_and_type_index;
+			u2 class_name_index = currentFrame->classFile->constant_pools[class_index].class_info.name_index;
+			u2 field_name_index = currentFrame->classFile->constant_pools[name_type_index].nameAndType_info.name_index;
+			u2 field_type_index = currentFrame->classFile->constant_pools[name_type_index].nameAndType_info.descriptor_index;
+
+			string class_name(currentFrame->classFile->constant_pools[class_name_index].utf8_info.bytes, currentFrame->classFile->constant_pools[class_name_index].utf8_info.length);
+			string field_name(currentFrame->classFile->constant_pools[field_name_index].utf8_info.bytes, currentFrame->classFile->constant_pools[field_name_index].utf8_info.length);
+			string field_type(currentFrame->classFile->constant_pools[field_type_index].utf8_info.bytes, currentFrame->classFile->constant_pools[field_type_index].utf8_info.length);
+			switch (field_type.data()[0]) {
+			case Descriptor::JVM_SIGNATURE_ARRAY:
+			case Descriptor::JVM_SIGNATURE_CLASS:
+			{
+				u4 value = currentFrame->popa();
+				u4 instance_index = currentFrame->popa();
+				Instance* instance = currentProcess->getInstance(instance_index);
+				if (instance->class_name.compare(class_name) != 0)
+					exit_with_massage(instance_index+" 实例 : 不是指定类型。");
+				fieldType field_value;
+				field_value.a = value;
+				instance->setField(field_name, field_value);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_BOOLEAN:
+			case Descriptor::JVM_SIGNATURE_BYTE:
+			{
+				char value = currentFrame->popb();
+				u4 instance_index = currentFrame->popa();
+				Instance* instance = currentProcess->getInstance(instance_index);
+				if (instance->class_name.compare(class_name) != 0)
+					exit_with_massage(instance_index + " 实例 : 不是指定类型。");
+				fieldType field_value;
+				field_value.b = value;
+				instance->setField(field_name, field_value);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_CHAR:
+			{
+				u2 value = currentFrame->popc();
+				u4 instance_index = currentFrame->popa();
+				Instance* instance = currentProcess->getInstance(instance_index);
+				if (instance->class_name.compare(class_name) != 0)
+					exit_with_massage(instance_index + " 实例 : 不是指定类型。");
+				fieldType field_value;
+				field_value.c = value;
+				instance->setField(field_name, field_value);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_DOUBLE:
+			{
+				double value = currentFrame->popd();
+				u4 instance_index = currentFrame->popa();
+				Instance* instance = currentProcess->getInstance(instance_index);
+				if (instance->class_name.compare(class_name) != 0)
+					exit_with_massage(instance_index + " 实例 : 不是指定类型。");
+				fieldType field_value;
+				field_value.d = value;
+				instance->setField(field_name, field_value);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_FLOAT:
+			{
+				float value = currentFrame->popf();
+				u4 instance_index = currentFrame->popa();
+				Instance* instance = currentProcess->getInstance(instance_index);
+				if (instance->class_name.compare(class_name) != 0)
+					exit_with_massage(instance_index + " 实例 : 不是指定类型。");
+				fieldType field_value;
+				field_value.f = value;
+				instance->setField(field_name, field_value);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_INT:
+			{
+				int value = currentFrame->popi();
+				u4 instance_index = currentFrame->popa();
+				Instance* instance = currentProcess->getInstance(instance_index);
+				if (instance->class_name.compare(class_name) != 0)
+					exit_with_massage(instance_index + " 实例 : 不是指定类型。");
+				fieldType field_value;
+				field_value.i = value;
+				instance->setField(field_name, field_value);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_LONG:
+			{
+				long long  value = currentFrame->popl();
+				u4 instance_index = currentFrame->popa();
+				Instance* instance = currentProcess->getInstance(instance_index);
+				if (instance->class_name.compare(class_name) != 0)
+					exit_with_massage(instance_index + " 实例 : 不是指定类型。");
+				fieldType field_value;
+				field_value.l = value;
+				instance->setField(field_name, field_value);
+				break;
+			}
+			case Descriptor::JVM_SIGNATURE_SHORT:
+			{
+				short  value = currentFrame->pops();
+				u4 instance_index = currentFrame->popa();
+				Instance* instance = currentProcess->getInstance(instance_index);
+				if (instance->class_name.compare(class_name) != 0)
+					exit_with_massage(instance_index + " 实例 : 不是指定类型。");
+				fieldType field_value;
+				field_value.s = value;
+				instance->setField(field_name, field_value);
+				break;
+			}
+			default:
+				exit_with_massage("unkonw field type: " + field_type.data()[0]);
+			}
+			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			break;
+		}
+		case invokevirtual: //0xb6 	调用实例方法
+		{
+			u2 index = currentFrame->getU2();
+
 			u2 class_index = currentFrame->classFile->constant_pools[index].methodref_info.class_index;
 			u2 name_type_index = currentFrame->classFile->constant_pools[index].methodref_info.name_and_type_index;
-			
+
 			u2 utf8_class_index = currentFrame->classFile->constant_pools[class_index].class_info.name_index;
 			u2 utf8_name_index = currentFrame->classFile->constant_pools[name_type_index].nameAndType_info.name_index;
 			u2 utf8_type_index = currentFrame->classFile->constant_pools[name_type_index].nameAndType_info.descriptor_index;
 
-			string class_name(currentFrame->classFile->constant_pools[utf8_class_index].utf8_info.bytes);
-			string method_name(currentFrame->classFile->constant_pools[utf8_name_index].utf8_info.bytes);
-			string method_descriptor(currentFrame->classFile->constant_pools[utf8_type_index].utf8_info.bytes);
-			StackFrame  *new_frame = new StackFrame(currentProcess->getClassFile(class_name), method_name, method_descriptor);
+			string class_name(currentFrame->classFile->constant_pools[utf8_class_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_class_index].utf8_info.length);
+			string method_name(currentFrame->classFile->constant_pools[utf8_name_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_name_index].utf8_info.length);
+			string method_descriptor(currentFrame->classFile->constant_pools[utf8_type_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_type_index].utf8_info.length);
+			StackFrame* new_frame = new StackFrame(currentProcess->getClassFile(class_name), method_name, method_descriptor);
+			stack<char> args;
+			for (int i = 0; i < method_descriptor.length(); i++) {//解析参数列表
+				if (method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_FUNC)
+					continue;
+				else if (method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_ARRAY || method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_CLASS) {
+					args.push(method_descriptor.data()[i]);
+					do {
+						i++;
+					} while (method_descriptor.data()[i] != Descriptor::JVM_SIGNATURE_ENDCLASS);
+				}
+				else if (method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_DOUBLE || method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_LONG) {
+					args.push(method_descriptor.data()[i]);
+					args.push(method_descriptor.data()[i]);
+				}
+				else if (method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_ENDFUNC)
+					break;
+				else
+					args.push(method_descriptor.data()[i]);
+			}
+			while (!args.empty()) {
+				switch (args.top())
+				{
+				case Descriptor::JVM_SIGNATURE_ARRAY:
+					new_frame->storea(args.size(), currentFrame->popa());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_BOOLEAN:
+					new_frame->storeb(args.size(), currentFrame->popb());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_BYTE:
+					new_frame->storeb(args.size(), currentFrame->popb());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_CHAR:
+					new_frame->storec(args.size(), currentFrame->popc());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_DOUBLE:
+					new_frame->stored(args.size() - 1, currentFrame->popd());
+					args.pop();
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_FLOAT:
+					new_frame->storef(args.size(), currentFrame->popf());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_INT:
+					new_frame->storei(args.size(), currentFrame->popi());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_LONG:
+					new_frame->storel(args.size() - 1, currentFrame->popl());
+					args.pop();
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_SHORT:
+					new_frame->stores(args.size(), currentFrame->pops());
+					args.pop();
+					break;
+				default:
+					exit_with_massage("未知的参数类型 : " + args.top());
+				}
+			}
+
+			new_frame->storea(0, currentFrame->popa());//存入实例的引用
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			currentThread->VMStack.push(currentFrame);
+			currentFrame = new_frame;
+			break;
+		}
+		case invokespecial: //0xb7 	调用超类构造方法，实例初始化方法，私有方法
+		{
+			u2 index = currentFrame->getU2();
+
+			u2 class_index = currentFrame->classFile->constant_pools[index].methodref_info.class_index;
+			u2 name_type_index = currentFrame->classFile->constant_pools[index].methodref_info.name_and_type_index;
+
+			u2 utf8_class_index = currentFrame->classFile->constant_pools[class_index].class_info.name_index;
+			u2 utf8_name_index = currentFrame->classFile->constant_pools[name_type_index].nameAndType_info.name_index;
+			u2 utf8_type_index = currentFrame->classFile->constant_pools[name_type_index].nameAndType_info.descriptor_index;
+
+			string class_name(currentFrame->classFile->constant_pools[utf8_class_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_class_index].utf8_info.length);
+			string method_name(currentFrame->classFile->constant_pools[utf8_name_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_name_index].utf8_info.length);
+			string method_descriptor(currentFrame->classFile->constant_pools[utf8_type_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_type_index].utf8_info.length);
+			StackFrame* new_frame = new StackFrame(currentProcess->getClassFile(class_name), method_name, method_descriptor);
+			stack<char> args;
+			for (int i = 0; i < method_descriptor.length(); i++) {//解析参数列表
+				if (method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_FUNC)
+					continue;
+				else if (method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_ARRAY || method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_CLASS) {
+					args.push(method_descriptor.data()[i]);
+					do {
+						i++;
+					} while (method_descriptor.data()[i] != Descriptor::JVM_SIGNATURE_ENDCLASS);
+				}
+				else if (method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_DOUBLE || method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_LONG) {
+					args.push(method_descriptor.data()[i]);
+					args.push(method_descriptor.data()[i]);
+				}
+				else if (method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_ENDFUNC)
+					break;
+				else
+					args.push(method_descriptor.data()[i]);
+			}
+			while (!args.empty()) {
+				switch (args.top())
+				{
+				case Descriptor::JVM_SIGNATURE_ARRAY:
+					new_frame->storea(args.size(), currentFrame->popa());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_BOOLEAN:
+					new_frame->storeb(args.size(), currentFrame->popb());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_BYTE:
+					new_frame->storeb(args.size() , currentFrame->popb());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_CHAR:
+					new_frame->storec(args.size() , currentFrame->popc());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_DOUBLE:
+					new_frame->stored(args.size() - 1, currentFrame->popd());
+					args.pop();
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_FLOAT:
+					new_frame->storef(args.size() , currentFrame->popf());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_INT:
+					new_frame->storei(args.size() , currentFrame->popi());
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_LONG:
+					new_frame->storel(args.size() - 1, currentFrame->popl());
+					args.pop();
+					args.pop();
+					break;
+				case Descriptor::JVM_SIGNATURE_SHORT:
+					new_frame->stores(args.size() , currentFrame->pops());
+					args.pop();
+					break;
+				default:
+					exit_with_massage("未知的参数类型 : " + args.top());
+				}
+			}
+
+			new_frame->storea(0, currentFrame->popa());//存入实例的引用
+			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
+			currentThread->VMStack.push(currentFrame);
+			currentFrame = new_frame;
 			break;
 		}
 		case invokestatic: //0xb8 	调用静态方法
@@ -1145,8 +1650,15 @@ void ExecuteEngine::execute() {
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
 		case new_: //0xbb 	创建一个对象，并将其引用值压入栈顶
+		{
+			u2 class_index = currentFrame->getU2();
+			u2 class_name_index = currentFrame->classFile->constant_pools[class_index].class_info.name_index;
+			string class_name(currentFrame->classFile->constant_pools[class_name_index].utf8_info.bytes, currentFrame->classFile->constant_pools[class_name_index].utf8_info.length);
+			ClassFile* class_file = currentProcess->getClassFile(class_name);
+			currentFrame->pusha( currentProcess->newInstance(class_name,class_file));
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
 			break;
+		}
 		case newarray: //0xbc 	创建一个指定原始类型（如int, float, char…）的数组，并将其引用值压入栈顶
 		{
 			u4 index = arrays->newArray();

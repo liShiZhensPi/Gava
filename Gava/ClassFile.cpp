@@ -4,13 +4,11 @@
 
 ClassFile::ClassFile(string filename)
 {
-	f.open(filename, ios::in | ios::binary);
+	if (filename.compare("java/lang/Object")==0)
+		filename = "gava/lang/Object";
+	f.open(filename+".class", ios::in | ios::binary);
 	if (!f)
-	{
-		cout << "Can't open file " << endl;
-		exit(-1);
-		return;
-	}
+		exit_with_massage("can't find class : " + filename);
 	parseFile();
 }
 

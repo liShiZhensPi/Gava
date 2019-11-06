@@ -19,9 +19,9 @@ public:
 	void putClassFile(string name, ClassFile* classFile);
 	Thread* getMainThread();
 	ClassFile* getMainClass();
-	Arrays* getArrays();
+	Arrays* getArrays();//Arrays 的层次有点不协调，待改进
 	Instance* getInstance(u4 index);
-	u4 newInstance(ClassFile *class_file);
+	u4 newInstance(string class_name,ClassFile *class_file);
 	~Process();
 private:
 	vector<Thread*> threads;
