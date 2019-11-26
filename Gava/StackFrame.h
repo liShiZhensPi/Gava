@@ -11,9 +11,16 @@ private:
 	char *codes;
 	OpStack *opstack;
 	LocalTable *local_table;
+
+	string classFile_name;
+	string method_name;
+	string method_descriptor;
 public:
 	ClassFile* classFile;
-	StackFrame(ClassFile *classFile,string method_name,string method_dexcriptor);
+	StackFrame(ClassFile *classFile,string classFile_name,string method_name,string method_descriptor);
+
+	void printStackFrame();
+
 	void printOpStack();
 	void printLocals();
 	u1 getCode();
@@ -22,6 +29,7 @@ public:
 	u4 getU4();
 	bool hasCode();
 	void goto_(short shift);
+
 
 
 	//8种数据类型  其中short 和 byte 在虚拟机中会转化为int存储；而 char（u2）会转化为引用类型（u4）存储

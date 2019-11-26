@@ -16,7 +16,7 @@ private:
 public:
 	ExecuteEngine(Process *process);
 
-	void execute();
+	void execute(bool  isVisualized);
 	~ExecuteEngine();
 };
 

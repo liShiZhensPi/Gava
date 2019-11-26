@@ -6,6 +6,7 @@
 #include"classfile_typedef.h"
 #include"classfile_constants.h"
 #include"error_exit.h"
+#include"typeTrabslate.h"
 
 using namespace std;
 
@@ -35,6 +36,7 @@ public:
 	Code_attribute* getMethodByNameAndType(string name,string type);
 	fieldType getField(string name);
 	void setField(string name, fieldType value);
+	void printClassFile();
 	~ClassFile();
 private:
 	map<string, fieldType> static_fields;
@@ -51,5 +53,12 @@ private:
 	void parseFields();
 	void parseMethods();
 	void parseAttributes();
+
+	//Êä³öº¯Êý
+	void printConstantPools();
+	void printFlags(u2 flags);
+	void printInterfaces();
+	void printFields();
+	void printMethods();
 };
 

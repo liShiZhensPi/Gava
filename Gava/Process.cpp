@@ -4,7 +4,7 @@
 
 Process::Process(string mainClass,ClassFile *main)
 {
-	threads.push_back(new Thread(main,"Main"));
+	threads.push_back(new Thread(main,mainClass,"Main"));
 	this->mainClass = mainClass;
 	classFiles.insert(pair<string,ClassFile*>(mainClass,main));
 	arrays = new Arrays();
@@ -57,6 +57,56 @@ u4 Process::newInstance(string class_name,ClassFile* class_file)
 	}
 	instances.push_back(new Instance(class_name,class_file));
 	return instances.size()-1;
+}
+
+void Process::printProcess()
+{
+	printClassFiles();
+	printInstances();
+	printArrays();
+	printThreads();
+}
+
+void Process::printClassFiles() {
+	cout << "ClassFiles: " << endl;
+	cout << "ClassFile_count: " << classFiles.size() << endl;
+	map<string, ClassFile*>::iterator iter;
+	for (iter = classFiles.begin(); iter != classFiles.end(); iter++) {
+		cout << iter->first << endl;
+		iter->second->printClassFile();
+	}
+}
+void Process::printInstances() {
+	cout<<"instances: " << endl;
+	cout << "isntance_count: " << instances.size() << endl;
+	for (int i = 0; i < instances.size(); i++) {
+
+		instances.at(i)->printInstance();
+	}
+	cout << "unused: " << unused_instances.size()<<endl;
+	stack<u4> unused;
+	while (!unused_instances.empty()) {
+		unused.push(unused_instances.top());
+		unused_instances.pop();
+	}
+	while (!unused.empty()) {
+		cout << unused.top() << endl;
+		unused_instances.push(unused.top());
+		unused.pop();
+	}
+	
+}
+
+void Process::printArrays() {
+	cout << "Arrays: " << endl;
+	arrays->printArrays();
+}
+
+void Process::printThreads() {
+	cout << "Threads: " << endl;
+	cout << "thread_cont: " << threads.size() << endl;
+	for (int i = 0; i < threads.size(); i++)
+		threads.at(i)->printThread();
 }
 
 Process::~Process()

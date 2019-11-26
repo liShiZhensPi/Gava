@@ -4,7 +4,7 @@
 
 ClassFile::ClassFile(string filename)
 {
-	if (filename.compare("java/lang/Object")==0)
+	if (filename.compare("java/lang/Object")==0)//不得已而为之
 		filename = "gava/lang/Object";
 	f.open(filename+".class", ios::in | ios::binary);
 	if (!f)
@@ -208,10 +208,7 @@ Code_attribute* ClassFile::getMethodByNameAndType(string main_name, string main_
 	MethodInfo* method = NULL;
 	for (int i = 0; i < methods_count; i++) {
 		//class文件规范的检查在类文件加载时进行
-		/*char *name = constant_pools[methods[i].name_index].utf8_info.bytes;
-		u2 name_length = constant_pools[methods[i].name_index].utf8_info.length;
-		char *type = constant_pools[methods[i].descriptor_index].utf8_info.bytes;
-		u2 type_length = constant_pools[methods[i].descriptor_index].utf8_info.length;*/
+
 
 		string name(constant_pools[methods[i].name_index].utf8_info.bytes, constant_pools[methods[i].name_index].utf8_info.length);
 		string type(constant_pools[methods[i].descriptor_index].utf8_info.bytes, constant_pools[methods[i].descriptor_index].utf8_info.length);
@@ -268,11 +265,190 @@ void ClassFile::setField(string name, fieldType value)
 	static_fields[name] = value;
 }
 
-//int ClassFile::constant_utf8_equal(char *s, u2 length,string str) {
-//	if (length != str.length())
-//		return -1;
-//	for (int i = 0; i < length; i++)
-//		if (s[i] != str.data()[i])
-//			return -1;
-//	return 0;
-//}
+void ClassFile::printClassFile()
+{
+
+	cout << hex;//16进制
+	cout << "magic_code: " <<  magic << endl;
+	cout << dec;
+	cout << "minor_version: " << minor_version << endl;
+	cout << "major_version: " << major_version << endl;
+	printConstantPools();
+	printFlags(access_flags);
+	cout << "this_class: " << this_class << endl;
+	cout << "super_class: " << super_class << endl;
+	printFields();
+	printMethods();
+}
+
+void ClassFile::printConstantPools() {
+	cout << "constant_pool _constant: " << constant_pool_count << endl;
+	for (int i = 1; i < constant_pool_count; i++) {
+		
+		switch (constant_pools[i].tag)
+		{
+		case Tags::JVM_CONSTANT_Class:
+			cout<<i<<" Class "<<" name_index: "<< constant_pools[i].class_info.name_index << endl;
+			break;
+		case Tags::JVM_CONSTANT_Fieldref:
+			cout << i << " Fieldref " << " class_index: " << constant_pools[i].fieldref_info.class_index << ", " << "name_and_type_index: " << constant_pools[i].fieldref_info.name_and_type_index << endl;
+			break;
+		case Tags::JVM_CONSTANT_Methodref:
+			cout << i << " Methodref " << " class_index: " << constant_pools[i].methodref_info.class_index << ", " << "name_and_type_index: " << constant_pools[i].methodref_info.name_and_type_index << endl;
+			break;
+		case Tags::JVM_CONSTANT_InterfaceMethodref:
+			cout << i << " InterfaceMethodref " << " class_index: " << constant_pools[i].interfaceMethodref_info.class_index << ", " << "name_and_type_index: " << constant_pools[i].interfaceMethodref_info.name_and_type_index << endl;
+			break;
+		case Tags::JVM_CONSTANT_String:
+			cout<<i<<" String "<<" string_index: "<< constant_pools[i].string_info.string_index << endl;
+			break;
+		case Tags::JVM_CONSTANT_Integer:
+			stackType constant_i;
+			constant_i.a = constant_pools[i].integer_info.bytes;
+			cout << i << " Integer " << " value: " << constant_i.i << endl;
+
+			break;
+		case Tags::JVM_CONSTANT_Float:
+			stackType constant_f;
+			constant_f.a = constant_pools[i].float_info.bytes;
+			cout << i << " Float " << " value: " << constant_f.f << endl;
+
+			break;
+		case Tags::JVM_CONSTANT_Long:
+			stackType2 constant_l;
+			constant_l.U4[0] = constant_pools[i].long_info.low_bytes;
+			constant_l.U4[1] = constant_pools[i].long_info.high_bytes;
+			cout << i << " Long " << " value: " << constant_l.l << endl;
+			i++;
+			break;
+		case Tags::JVM_CONSTANT_Double:
+			stackType2 constant_d;
+			constant_d.U4[0] = constant_pools[i].double_info.low_bytes;
+			constant_d.U4[1] = constant_pools[i].double_info.high_bytes;
+			cout << i << " Double " << " value: " << constant_d.d << endl;
+			i++;
+			break;
+		case JVM_CONSTANT_NameAndType:
+			cout<<i<<" NameAndType "<<" name_index: "<< constant_pools[i].nameAndType_info.name_index<<", "<<" descriptor_index: "<< constant_pools[i].nameAndType_info.descriptor_index << endl;
+			break;
+		case Tags::JVM_CONSTANT_Utf8: {
+			string cosntant_string(constant_pools[i].utf8_info.bytes, constant_pools[i].utf8_info.length);
+			cout << i << " Utf8 " << " constant_string: " << cosntant_string << endl;
+			break;
+		}
+		case Tags::JVM_CONSTANT_MethodHandle:
+			cout << i << " MethodHandle " << " reference_kind: " << constant_pools[i].methodHandle_info.reference_kind << ", " << " reference_index: " << constant_pools[i].methodHandle_info.reference_index << endl;
+
+			break;
+		case Tags::JVM_CONSTANT_MethodType:
+			cout<<i<<" MethodType "<<"descriptor_index: "<< constant_pools[i].methodType_info.descriptor_index << endl;
+
+			break;
+		case Tags::JVM_CONSTANT_InvokeDynamic:
+			cout << i << " InvokeDynamic " << "attr_index: " << constant_pools[i].invokeDynamic_info.bootstrap_method_attr_index << ", " << " name_and_type_index: " << constant_pools[i].invokeDynamic_info.name_and_type_index << endl;
+
+			break;
+		default:
+			cout << "UnKnow tag:" << constant_pools[i].tag << endl;
+			exit(0);
+		}
+	}
+
+}
+
+void ClassFile::printFlags(u2 flags)
+{
+	cout << "accessFlags: ";
+	if ((flags & JVM_ACC_PUBLIC) != 0)
+		cout << " PUBLIC";
+	if ((flags & JVM_ACC_PRIVATE)!=0)
+		cout << " PRIVATE";
+	if ((flags & JVM_ACC_PROTECTED) != 0)
+		cout << " PROTECTED";
+	if ((flags & JVM_ACC_STATIC) != 0)
+		cout << " STATIC";
+	if ((flags & JVM_ACC_FINAL) != 0)
+		cout << " FINAL";
+	if ((flags & JVM_ACC_SYNCHRONIZED) != 0)
+		cout << " SYNCHRONIZED";
+	if ((flags & JVM_ACC_SUPER) != 0)
+		cout << " SUPER";
+	if ((flags & JVM_ACC_VOLATILE) != 0)
+		cout << " VOLATILE";
+	if ((flags & JVM_ACC_BRIDGE) != 0)
+		cout << " BRIDGE";
+	if ((flags & JVM_ACC_TRANSIENT) != 0)
+		cout << " TRANSIENT";
+	if ((flags & JVM_ACC_VARARGS) != 0)
+		cout << " VARARGS";
+	if ((flags & JVM_ACC_NATIVE) != 0)
+		cout << " NATIVE";
+	if ((flags & JVM_ACC_INTERFACE) != 0)
+		cout << " INTERFACE";
+	if ((flags & JVM_ACC_ABSTRACT) != 0)
+		cout << " ABSTRACT ";
+	if ((flags & JVM_ACC_STRICT) != 0)
+		cout << " STRICT";
+	if ((flags & JVM_ACC_SYNTHETIC) != 0)
+		cout << " SYNTHETIC";
+	if ((flags & JVM_ACC_ANNOTATION) != 0)
+		cout << " ANNOTATION";
+	if ((flags & JVM_ACC_ENUM) != 0)
+		cout << " ENUM";
+	if ((flags & JVM_ACC_MODULE) != 0)
+		cout << " MODULE";
+	cout << endl;
+}
+
+void ClassFile::printInterfaces()
+{
+	cout << "interfaces_count: " << interfaces_count << endl;
+	for (int i = 0; i < interfaces_count; i++)
+		cout << "interfaces_info: "<<interfaces[i] << endl;
+}
+
+void ClassFile::printFields()
+{
+	cout << "fields_count: " << fields_count << endl;
+	for (int i = 0; i < fields_count; i++) {
+		cout << "Fields " <<i <<endl;
+		printFlags(fields[i].access_flags);
+		cout << "name_index: " << fields[i].name_index << endl;
+		cout << "descriptor_index" << fields[i].descriptor_index << endl;
+	}
+}
+
+void ClassFile::printMethods()
+{
+	cout << "method_count: " << methods_count << endl;
+	for (int i = 0; i < methods_count; i++) {
+		cout << "Method: " << i << endl;
+		printFlags(methods[i].access_flags);
+		cout << "name_index: " << methods[i].name_index << endl;
+		cout << "descriptor: " << methods[i].descriptor_index << endl;
+		char* info = NULL;
+
+		for (int j = 0; j < methods[i].attributes_count; j++) {
+			string attribute_name(constant_pools[methods[i].attributes[j].attribute_name_index].utf8_info.bytes, constant_pools[methods[i].attributes[j].attribute_name_index].utf8_info.length);
+			if (attribute_name.compare("Code") == 0) 
+				info = methods[i].attributes[j].info;
+		}
+
+		if (info == NULL)
+			exit_with_massage("can't find code in this method");
+		Code_attribute* code = new Code_attribute();
+		code->max_stack = (((u2)info[0] << 8) & 0xff00) | ((u2)info[1] & 0x00ff);
+		code->max_locals = (((u2)info[2] << 8) & 0xff00) | ((u2)info[3] & 0x00ff);
+		code->code_length = (((u2)info[4] << 24) & 0xff000000) | (((u2)info[5] << 16) & 0x00ff0000) | (((u2)info[6] << 8) & 0x0000ff00) | (((u2)info[7]) & 0x000000ff);
+		code->codes = &info[8];//info[8~8+code_length]为代码
+
+		cout <<"max_stack: "<< code->max_stack <<" max_locals: "<<  code->max_locals << endl;
+		cout << "code_length: " << code->code_length << endl;
+		cout << hex;
+		for (int j = 0; j < code->code_length; j++)
+			printf("%.2x\n", code->codes[j]);
+			//cout << code->codes[j] << endl;
+		cout << dec;
+	}
+}
+

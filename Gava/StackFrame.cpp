@@ -2,16 +2,32 @@
 
 
 
-StackFrame::StackFrame(ClassFile *classFile,string method_name,string method_descriptor)
+StackFrame::StackFrame(ClassFile *classFile,string classFile_name,string method_name,string method_descriptor)
 {
 
 	pc = 0;
 	Code_attribute*  code = classFile->getMethodByNameAndType(method_name, method_descriptor);
 	this->classFile = classFile;
+	this->method_name = method_name;
+	this->method_descriptor = method_descriptor;
+	this->classFile_name = classFile_name;
 	this->code_length = code->code_length;
 	this->codes = code->codes;
 	this->opstack = new OpStack(code->max_stack);
 	this->local_table = new LocalTable(code->max_locals);
+}
+
+void StackFrame::printStackFrame()
+{
+	cout << "class_name: " << classFile_name << endl;
+	cout << "method_name: " << method_name << endl;
+	cout << "method_descriptor: " << method_descriptor << endl;
+	cout << "pc: " << pc << endl;
+	cout << "code_length: " << code_length << endl;
+	for (int i = 0; i < code_length; i++)
+		printf("%.2x\n", codes[i]);
+	printOpStack();
+	printLocals();
 }
 
 u1 StackFrame::getCode() {

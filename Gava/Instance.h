@@ -12,6 +12,7 @@ public:
 	Instance(string class_name,ClassFile* class_file);
 	void setField(string field, fieldType value);
 	fieldType getField(string field);
+	void printInstance();
 	~Instance();
 private:
 	map<string, fieldType> fields;

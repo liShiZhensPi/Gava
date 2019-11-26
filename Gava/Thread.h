@@ -8,8 +8,9 @@ class Thread
 {
 public:
 	stack<StackFrame*> VMStack;
-	Thread(ClassFile *classFile,string name);
+	Thread(ClassFile *classFile,string class_name,string name);
 	StackFrame* getStackFrame();
+	void printThread();
 	~Thread();
 private:
 	string name;

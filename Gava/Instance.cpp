@@ -36,6 +36,16 @@ fieldType Instance::getField(string field)
 	return fields[field];
 }
 
+void Instance::printInstance()
+{
+	cout << "class_name: " << class_name << endl;
+	map<string, fieldType>::iterator iter;
+	cout << "field_count: " << fields.size() << endl;
+	for (iter = fields.begin(); iter != fields.end(); iter++) {
+		cout << iter->first << " : " << iter->second.a << endl;
+	}
+}
+
 Instance::~Instance()
 {
 }

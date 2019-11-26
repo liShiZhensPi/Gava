@@ -22,6 +22,8 @@ public:
 	Arrays* getArrays();//Arrays 的层次有点不协调，待改进
 	Instance* getInstance(u4 index);
 	u4 newInstance(string class_name,ClassFile *class_file);
+
+	void printProcess();
 	~Process();
 private:
 	vector<Thread*> threads;
@@ -30,6 +32,11 @@ private:
 	vector<Instance*> instances;
 	stack<u4> unused_instances;
 	Arrays *arrays;
+
+	void printClassFiles();
+	void printInstances();
+	void printArrays();
+	void printThreads();
 
 };
 

@@ -11,12 +11,17 @@ ExecuteEngine::ExecuteEngine(Process *process)
 	this->arrays = process->getArrays();
 }
 
-void ExecuteEngine::execute() {
+void ExecuteEngine::execute(bool isVisualized) {
 	short opcode_length[] = JVM_OPCODE_LENGTH_INITIALIZER;
 	u4 null = 0;
 	while (currentFrame->hasCode()) {
-		currentFrame->printOpStack();
-		currentFrame->printLocals();
+		/*currentFrame->printOpStack();
+		currentFrame->printLocals();*/
+		if (isVisualized) {
+			int instruct;
+			cout << "please write the code" << endl;
+			cin >> instruct;
+		}
 		u1 code = currentFrame->getCode();
 		switch (code)
 		{
@@ -957,10 +962,11 @@ void ExecuteEngine::execute() {
 			break;
 		case ireturn: //0xac 	从当前方法返回int
 		{
+			currentThread->VMStack.pop();
 			if (currentThread->VMStack.empty())
 				exit(currentFrame->popi());
 			StackFrame* back_frame = currentThread->VMStack.top();
-			currentThread->VMStack.pop();
+			
 			back_frame->pushi(currentFrame->popi());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);//似乎这是一条没用的语句
 			currentFrame = back_frame;
@@ -968,10 +974,11 @@ void ExecuteEngine::execute() {
 		}
 		case lreturn: //0xad 	从当前方法返回long
 		{
+			currentThread->VMStack.pop();
 			if (currentThread->VMStack.empty())
 				exit(currentFrame->popl());
 			StackFrame* back_frame = currentThread->VMStack.top();
-			currentThread->VMStack.pop();
+			
 			back_frame->pushl(currentFrame->popl());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);//似乎这是一条没用的语句
 			currentFrame = back_frame;
@@ -979,10 +986,11 @@ void ExecuteEngine::execute() {
 		}
 		case freturn: //0xae 	从当前方法返回float
 		{
+			currentThread->VMStack.pop();
 			if (currentThread->VMStack.empty())
 				exit(currentFrame->popf());
 			StackFrame* back_frame = currentThread->VMStack.top();
-			currentThread->VMStack.pop();
+			
 			back_frame->pushf(currentFrame->popf());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);//似乎这是一条没用的语句
 			currentFrame = back_frame;
@@ -990,10 +998,11 @@ void ExecuteEngine::execute() {
 		}
 		case dreturn: //0xaf 	从当前方法返回do le
 		{
+			currentThread->VMStack.pop();
 			if (currentThread->VMStack.empty())
 				exit(currentFrame->popd());
 			StackFrame* back_frame = currentThread->VMStack.top();
-			currentThread->VMStack.pop();
+			
 			back_frame->pushd(currentFrame->popd());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);//似乎这是一条没用的语句
 			currentFrame = back_frame;
@@ -1001,10 +1010,11 @@ void ExecuteEngine::execute() {
 		}
 		case areturn: //0xb0 	从当前方法返回对象引用
 		{
+			currentThread->VMStack.pop();
 			if (currentThread->VMStack.empty())
 				exit(currentFrame->popa());
 			StackFrame* back_frame = currentThread->VMStack.top();
-			currentThread->VMStack.pop();
+			
 			back_frame->pusha(currentFrame->popa());
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);//似乎这是一条没用的语句
 			currentFrame = back_frame;
@@ -1012,10 +1022,11 @@ void ExecuteEngine::execute() {
 		}
 		case return_: //0xb1 	从当前方法返回void
 		{
+			currentThread->VMStack.pop();
 			if (currentThread->VMStack.empty())
 				exit(0);
 			StackFrame* back_frame = currentThread->VMStack.top();
-			currentThread->VMStack.pop();
+			
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);//似乎这是一条没用的语句
 			currentFrame = back_frame;
 			break;
@@ -1400,7 +1411,7 @@ void ExecuteEngine::execute() {
 			string class_name(currentFrame->classFile->constant_pools[utf8_class_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_class_index].utf8_info.length);
 			string method_name(currentFrame->classFile->constant_pools[utf8_name_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_name_index].utf8_info.length);
 			string method_descriptor(currentFrame->classFile->constant_pools[utf8_type_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_type_index].utf8_info.length);
-			StackFrame* new_frame = new StackFrame(currentProcess->getClassFile(class_name), method_name, method_descriptor);
+			StackFrame* new_frame = new StackFrame(currentProcess->getClassFile(class_name), class_name,method_name, method_descriptor);
 			stack<char> args;
 			for (int i = 0; i < method_descriptor.length(); i++) {//解析参数列表
 				if (method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_FUNC)
@@ -1468,7 +1479,7 @@ void ExecuteEngine::execute() {
 
 			new_frame->storea(0, currentFrame->popa());//存入实例的引用
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
-			currentThread->VMStack.push(currentFrame);
+			currentThread->VMStack.push(new_frame);
 			currentFrame = new_frame;
 			break;
 		}
@@ -1486,7 +1497,7 @@ void ExecuteEngine::execute() {
 			string class_name(currentFrame->classFile->constant_pools[utf8_class_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_class_index].utf8_info.length);
 			string method_name(currentFrame->classFile->constant_pools[utf8_name_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_name_index].utf8_info.length);
 			string method_descriptor(currentFrame->classFile->constant_pools[utf8_type_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_type_index].utf8_info.length);
-			StackFrame* new_frame = new StackFrame(currentProcess->getClassFile(class_name), method_name, method_descriptor);
+			StackFrame* new_frame = new StackFrame(currentProcess->getClassFile(class_name),class_name, method_name, method_descriptor);
 			stack<char> args;
 			for (int i = 0; i < method_descriptor.length(); i++) {//解析参数列表
 				if (method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_FUNC)
@@ -1554,7 +1565,7 @@ void ExecuteEngine::execute() {
 
 			new_frame->storea(0, currentFrame->popa());//存入实例的引用
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
-			currentThread->VMStack.push(currentFrame);
+			currentThread->VMStack.push(new_frame);
 			currentFrame = new_frame;
 			break;
 		}
@@ -1572,7 +1583,7 @@ void ExecuteEngine::execute() {
 			string class_name(currentFrame->classFile->constant_pools[utf8_class_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_class_index].utf8_info.length);
 			string method_name(currentFrame->classFile->constant_pools[utf8_name_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_name_index].utf8_info.length);
 			string method_descriptor(currentFrame->classFile->constant_pools[utf8_type_index].utf8_info.bytes, currentFrame->classFile->constant_pools[utf8_type_index].utf8_info.length);
-			StackFrame* new_frame = new StackFrame(currentProcess->getClassFile(class_name), method_name, method_descriptor);
+			StackFrame* new_frame = new StackFrame(currentProcess->getClassFile(class_name),class_name, method_name, method_descriptor);
 			stack<char> args;
 			for (int i = 0; i < method_descriptor.length(); i++) {//解析参数列表
 				if (method_descriptor.data()[i] == Descriptor::JVM_SIGNATURE_FUNC)
@@ -1639,7 +1650,7 @@ void ExecuteEngine::execute() {
 			}
 
 			currentFrame->goto_(opcode_length[(u4)code & 0x000000ff]);
-			currentThread->VMStack.push(currentFrame);
+			currentThread->VMStack.push(new_frame);
 			currentFrame = new_frame;
 			break;
 		}
@@ -1670,27 +1681,35 @@ void ExecuteEngine::execute() {
 			{
 			case ArrayType::JVM_T_BOOLEAN:
 				a->array_date->boolean_array = new char[length]();
+				a->array_type = ArrayType::JVM_T_BOOLEAN;
 				break;
 			case ArrayType::JVM_T_BYTE:
 				a->array_date->byte_array = new char[length]();
+				a->array_type = ArrayType::JVM_T_BYTE;
 				break;
 			case ArrayType::JVM_T_CHAR:
 				a->array_date->char_array = new u2[length]();
+				a->array_type = ArrayType::JVM_T_CHAR;
 				break;
 			case ArrayType::JVM_T_DOUBLE:
 				a->array_date->double_array = new double[length]();
+				a->array_type = ArrayType::JVM_T_DOUBLE;
 				break;
 			case ArrayType::JVM_T_FLOAT:
 				a->array_date->float_array = new float[length]();
+				a->array_type = ArrayType::JVM_T_FLOAT;
 				break;
 			case ArrayType::JVM_T_INT:
 				a->array_date->int_array = new int[length]();
+				a->array_type = ArrayType::JVM_T_INT;
 				break;
 			case ArrayType::JVM_T_LONG:
 				a->array_date->long_array = new long long[length]();
+				a->array_type = ArrayType::JVM_T_LONG;
 				break;
 			case ArrayType::JVM_T_SHORT:
 				a->array_date->short_array = new short[length]();
+				a->array_type = ArrayType::JVM_T_SHORT;
 				break;
 			default:
 				//释放数组
@@ -1753,6 +1772,10 @@ void ExecuteEngine::execute() {
 			cerr << "UnKnow opcode" << endl;
 			exit(-1);
 			break;
+		}
+
+		if (isVisualized) {
+			currentProcess->printProcess();
 		}
 	}
 }
