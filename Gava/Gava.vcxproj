@@ -147,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
+    <None Include="gava\lang\Object.class" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="test.txt" />
