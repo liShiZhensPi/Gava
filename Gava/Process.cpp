@@ -2,8 +2,9 @@
 
 
 
-Process::Process(string mainClass,ClassFile *main)
+Process::Process(string mainClass,ClassFile *main,string class_path)
 {
+	this->class_path = class_path;
 	threads.push_back(new Thread(main,mainClass,"Main"));
 	this->mainClass = mainClass;
 	classFiles.insert(pair<string,ClassFile*>(mainClass,main));
@@ -14,7 +15,7 @@ ClassFile* Process::getClassFile(string name)
 {
 	if (classFiles.find(name) == classFiles.end())//在此处实现类的加载
 	{
-		classFiles.insert(pair<string, ClassFile*>(name, new ClassFile(name)));
+		classFiles.insert(pair<string, ClassFile*>(name, new ClassFile(name,class_path)));
 	}
 	return classFiles.at(name);
 }
@@ -104,7 +105,7 @@ void Process::printArrays() {
 
 void Process::printThreads() {
 	cout << "Threads: " << endl;
-	cout << "thread_cont: " << threads.size() << endl;
+	cout << "thread_count: " << threads.size() << endl;
 	for (int i = 0; i < threads.size(); i++)
 		threads.at(i)->printThread();
 }

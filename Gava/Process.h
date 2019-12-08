@@ -14,7 +14,7 @@ class Process
 {
 public:
 
-	Process(string mainClass,ClassFile *main);
+	Process(string mainClass,ClassFile *main,string class_path);
 	ClassFile* getClassFile(string name);
 	void putClassFile(string name, ClassFile* classFile);
 	Thread* getMainThread();
@@ -26,6 +26,7 @@ public:
 	void printProcess();
 	~Process();
 private:
+	string class_path;
 	vector<Thread*> threads;
 	string mainClass;
 	map<string, ClassFile*> classFiles;

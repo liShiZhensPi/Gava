@@ -2,10 +2,17 @@
 
 
 
-ClassFile::ClassFile(string filename)
+ClassFile::ClassFile(string filename,string class_path)
 {
-	if (filename.compare("java/lang/Object")==0)//不得已而为之
+	if (filename.compare("java/lang/Object") == 0)//不得已而为之
+	{
+		SetCurrentDirectory("C:\\Users\\asus\\Desktop\\vs_project\\GVM\\GVM\\bin\\Debug");
 		filename = "gava/lang/Object";
+	}
+	else {
+		if(!class_path.empty())
+		SetCurrentDirectory(class_path.c_str());
+	}
 	f.open(filename+".class", ios::in | ios::binary);
 	if (!f)
 		exit_with_massage("can't find class : " + filename);
@@ -414,7 +421,7 @@ void ClassFile::printFields()
 		cout << "Fields " <<i <<endl;
 		printFlags(fields[i].access_flags);
 		cout << "name_index: " << fields[i].name_index << endl;
-		cout << "descriptor_index" << fields[i].descriptor_index << endl;
+		cout << "descriptor_index: " << fields[i].descriptor_index << endl;
 	}
 }
 
@@ -441,12 +448,12 @@ void ClassFile::printMethods()
 		code->max_locals = (((u2)info[2] << 8) & 0xff00) | ((u2)info[3] & 0x00ff);
 		code->code_length = (((u2)info[4] << 24) & 0xff000000) | (((u2)info[5] << 16) & 0x00ff0000) | (((u2)info[6] << 8) & 0x0000ff00) | (((u2)info[7]) & 0x000000ff);
 		code->codes = &info[8];//info[8~8+code_length]为代码
-
+		
 		cout <<"max_stack: "<< code->max_stack <<" max_locals: "<<  code->max_locals << endl;
 		cout << "code_length: " << code->code_length << endl;
 		cout << hex;
 		for (int j = 0; j < code->code_length; j++)
-			printf("%.2x\n", code->codes[j]);
+			printf("%02hhx\n", code->codes[j]);
 			//cout << code->codes[j] << endl;
 		cout << dec;
 	}

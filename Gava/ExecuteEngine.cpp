@@ -9,18 +9,21 @@ ExecuteEngine::ExecuteEngine(Process *process)
 	//this->currentClass = process->getMainClass();
 	this->currentFrame = currentThread->getStackFrame();
 	this->arrays = process->getArrays();
+	process->printProcess();
 }
 
 void ExecuteEngine::execute(bool isVisualized) {
 	short opcode_length[] = JVM_OPCODE_LENGTH_INITIALIZER;
 	u4 null = 0;
 	while (currentFrame->hasCode()) {
-		/*currentFrame->printOpStack();
-		currentFrame->printLocals();*/
+	
+
 		if (isVisualized) {
-			int instruct;
-			cout << "please write the code" << endl;
+			string instruct;
+
 			cin >> instruct;
+			if (instruct.compare("end") == 0)//½áÊøÖ¸Áî
+				break;
 		}
 		u1 code = currentFrame->getCode();
 		switch (code)

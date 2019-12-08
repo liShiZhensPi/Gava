@@ -3,6 +3,7 @@
 #include<iostream>
 #include<fstream>
 #include<map>
+#include<Windows.h>
 #include"classfile_typedef.h"
 #include"classfile_constants.h"
 #include"error_exit.h"
@@ -31,7 +32,7 @@ public:
 	u2 attributes_count;
 	AttributeInfo* attributes;
 
-	ClassFile(string filename);
+	ClassFile(string filename,string class_path);
 	/*int constant_utf8_equal(char* s, u2 length, string str);*/
 	Code_attribute* getMethodByNameAndType(string name,string type);
 	fieldType getField(string name);

@@ -96,8 +96,7 @@ void Arrays::printArrays()
 				}
 			}
 	}
-	cout << "unused: " << endl;
-	cout << "unused_count: " << unused.size() << endl;
+	cout << "unused: " << unused.size() << endl;
 	stack<u4> unused2;
 	while (!unused.empty()) {
 		unused2.push(unused.top());

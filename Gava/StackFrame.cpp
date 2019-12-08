@@ -25,7 +25,7 @@ void StackFrame::printStackFrame()
 	cout << "pc: " << pc << endl;
 	cout << "code_length: " << code_length << endl;
 	for (int i = 0; i < code_length; i++)
-		printf("%.2x\n", codes[i]);
+		printf("%02hhx\n", codes[i]);
 	printOpStack();
 	printLocals();
 }
@@ -272,6 +272,7 @@ void StackFrame::printLocals()
 {
 	local_table->print();
 }
+
 StackFrame::~StackFrame()
 {
 }

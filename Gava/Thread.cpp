@@ -17,7 +17,7 @@ StackFrame* Thread::getStackFrame() {
 
 void Thread::printThread()
 {
-	cout << "thread_name: " << name << endl;
+	cout <<name << endl;
 	cout << "VMStack: " << VMStack.size() << endl;
 	stack<StackFrame*> vm;
 	while (!VMStack.empty()) {

@@ -19,7 +19,7 @@ void LocalTable::store(u2 index, u4 value)
 
 void LocalTable::print()
 {
-	cout << "local:" << endl;
+	cout << "local: " <<length<< endl;
 	for (int i = 0; i < length; i++)
 		cout << locals[i] << endl;
 }
