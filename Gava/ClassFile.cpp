@@ -6,7 +6,7 @@ ClassFile::ClassFile(string filename,string class_path)
 {
 	if (filename.compare("java/lang/Object") == 0)//不得已而为之
 	{
-		SetCurrentDirectory("C:\\Users\\asus\\Desktop\\vs_project\\GVM\\GVM\\bin\\Debug");
+		SetCurrentDirectory("C:\\Users\\asus\\Desktop\\vs_project\\Gava\\Gava");
 		filename = "gava/lang/Object";
 	}
 	else {
@@ -17,6 +17,7 @@ ClassFile::ClassFile(string filename,string class_path)
 	if (!f)
 		exit_with_massage("can't find class : " + filename);
 	parseFile();
+	init_static_fields();
 }
 
 void ClassFile::parseFile(){
@@ -169,8 +170,8 @@ void ClassFile::init_static_fields()
 {
 
 	for (int i = 0; i < fields_count; i++) {
-		if ((fields[i].access_flags & Flags::JVM_ACC_STATIC) == 1&&(fields[i].access_flags & Flags::JVM_ACC_FINAL)==0) {
-			string name = constant_pools[fields[i].name_index].utf8_info.bytes;//获取属性的name
+		if ((fields[i].access_flags & Flags::JVM_ACC_STATIC) != 1&&(fields[i].access_flags & Flags::JVM_ACC_FINAL)==0) {
+			string name(constant_pools[fields[i].name_index].utf8_info.bytes, constant_pools[fields[i].name_index].utf8_info.length);//获取属性的name
 			fieldType a;
 			a.l = 0;//初始化为0   float和double暂不考虑
 			static_fields.insert(pair<string, fieldType>(name, a));
