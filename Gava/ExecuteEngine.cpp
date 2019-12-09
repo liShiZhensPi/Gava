@@ -1085,6 +1085,7 @@ void ExecuteEngine::execute(bool isVisualized) {
 				ClassFile* class_file = currentProcess->getClassFile(class_name);
 				currentFrame->pushi(class_file->getField(field_name).i);
 				break;
+
 			}
 			case Descriptor::JVM_SIGNATURE_LONG:
 			{
