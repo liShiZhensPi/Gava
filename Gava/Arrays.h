@@ -6,7 +6,7 @@
 #include<iostream>
 using namespace std;
 
-typedef struct {
+typedef struct gava_array{
 	char array_type;
 	arrayType* array_date = NULL;
 	u4 array_length = 0;
