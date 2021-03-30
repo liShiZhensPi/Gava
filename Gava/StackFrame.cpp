@@ -24,7 +24,7 @@ void StackFrame::printStackFrame()
 	cout << "method_descriptor: " << method_descriptor << endl;
 	cout << "pc: " << pc << endl;
 	cout << "code_length: " << code_length << endl;
-	for (int i = 0; i < code_length; i++)
+	for (unsigned int i = 0; i < code_length; i++)
 		printf("%02hhx\n", codes[i]);
 	printOpStack();
 	printLocals();

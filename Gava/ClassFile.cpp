@@ -6,7 +6,7 @@ ClassFile::ClassFile(string filename,string class_path)
 {
 	if (filename.compare("java/lang/Object") == 0)//不得已而为之
 	{
-		SetCurrentDirectory("C:\\Users\\asus\\Desktop\\vs_project\\Gava\\Gava");
+		SetCurrentDirectory("D:\\Code\\Gava\\Gava");
 		filename = "gava/lang/Object";
 	}
 	else {

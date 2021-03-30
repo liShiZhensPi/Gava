@@ -2,7 +2,7 @@
 #include"ClassFile.h"
 #include"OpStack.h"
 #include"LocalTable.h"
-#include"typeTrabslate.h"
+#include"typeTranslate.h"
 class StackFrame
 {
 private:

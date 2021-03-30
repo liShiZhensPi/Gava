@@ -131,7 +131,7 @@
     <ClInclude Include="OpStack.h" />
     <ClInclude Include="StackFrame.h" />
     <ClInclude Include="Thread.h" />
-    <ClInclude Include="typeTrabslate.h" />
+    <ClInclude Include="typeTranslate.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Arrays.cpp" />

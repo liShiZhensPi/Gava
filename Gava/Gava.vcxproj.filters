@@ -54,13 +54,13 @@
     <ClInclude Include="Opcodes.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="typeTrabslate.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Arrays.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="error_exit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="typeTranslate.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

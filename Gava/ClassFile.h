@@ -7,7 +7,7 @@
 #include"classfile_typedef.h"
 #include"classfile_constants.h"
 #include"error_exit.h"
-#include"typeTrabslate.h"
+#include"typeTranslate.h"
 
 using namespace std;
 
