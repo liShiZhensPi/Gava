@@ -1,7 +1,7 @@
 #pragma once
 #include"classfile_typedef.h"
 typedef union {
-	u4 a;
+	u4 U4;
 	int i;
 	//short s[2];
 	//u2 c[2];

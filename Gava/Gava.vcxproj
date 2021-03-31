@@ -129,6 +129,7 @@
     <ClInclude Include="Instance.h" />
     <ClInclude Include="LocalTable.h" />
     <ClInclude Include="OpStack.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="StackFrame.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="typeTranslate.h" />
@@ -151,6 +152,9 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="test.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Gava.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

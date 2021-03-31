@@ -312,13 +312,13 @@ void ClassFile::printConstantPools() {
 			break;
 		case Tags::JVM_CONSTANT_Integer:
 			stackType constant_i;
-			constant_i.a = constant_pools[i].integer_info.bytes;
+			constant_i.U4 = constant_pools[i].integer_info.bytes;
 			cout << i << " Integer " << " value: " << constant_i.i << endl;
 
 			break;
 		case Tags::JVM_CONSTANT_Float:
 			stackType constant_f;
-			constant_f.a = constant_pools[i].float_info.bytes;
+			constant_f.U4 = constant_pools[i].float_info.bytes;
 			cout << i << " Float " << " value: " << constant_f.f << endl;
 
 			break;

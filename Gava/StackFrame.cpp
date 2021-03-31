@@ -68,31 +68,31 @@ void StackFrame::pushb(char value)
 {
 	stackType stack;
 	stack.i = value;
-	opstack->push(stack.a);
+	opstack->push(stack.U4);
 }
 void StackFrame::pushs(short value)
 {
 	stackType stack;
 	stack.i = value;
-	opstack->push(stack.a);
+	opstack->push(stack.U4);
 }
 void StackFrame::pushc(u2 value)
 {
 	stackType stack;
-	stack.a = value;
-	opstack->push(stack.a);
+	stack.U4 = value;
+	opstack->push(stack.U4);
 }
 void StackFrame::pusha(u4 value)
 {
 	stackType stack;
-	stack.a = value;
-	opstack->push(stack.a);
+	stack.U4 = value;
+	opstack->push(stack.U4);
 }
 void StackFrame::pushi(int value)
 {
 	stackType stack;
 	stack.i = value;
-	opstack->push(stack.a);
+	opstack->push(stack.U4);
 }
 void StackFrame::pushl(long long value)
 {
@@ -105,7 +105,7 @@ void StackFrame::pushf(float value)
 {
 	stackType stack;
 	stack.f = value;
-	opstack->push(stack.a);
+	opstack->push(stack.U4);
 }
 void StackFrame::pushd(double value)
 {
@@ -117,31 +117,31 @@ void StackFrame::pushd(double value)
 char StackFrame::popb()
 {
 	stackType stack;
-	stack.a = opstack->pop();
+	stack.U4 = opstack->pop();
 	return stack.i;
 }
 short StackFrame::pops()
 {
 	stackType stack;
-	stack.a = opstack->pop();
+	stack.U4 = opstack->pop();
 	return stack.i;
 }
 u2 StackFrame::popc()
 {
 	stackType stack;
-	stack.a = opstack->pop();
-	return stack.a;
+	stack.U4 = opstack->pop();
+	return stack.U4;
 }
 u4 StackFrame::popa()
 {
 	stackType stack;
-	stack.a = opstack->pop();
-	return stack.a;
+	stack.U4 = opstack->pop();
+	return stack.U4;
 }
 int StackFrame::popi()
 {
 	stackType stack;
-	stack.a = opstack->pop();
+	stack.U4 = opstack->pop();
 	return stack.i;
 }
 long long StackFrame::popl()
@@ -154,7 +154,7 @@ long long StackFrame::popl()
 float StackFrame::popf()
 {
 	stackType stack;
-	stack.a = opstack->pop();
+	stack.U4 = opstack->pop();
 	return stack.f;
 }
 double StackFrame::popd()
@@ -168,31 +168,31 @@ void StackFrame::storeb(u2 index, char value)
 {
 	stackType stack;
 	stack.i = value;
-	local_table->store(index, stack.a);
+	local_table->store(index, stack.U4);
 }
 void StackFrame::storec(u2 index, u2 value)
 {
 	stackType stack;
-	stack.a = value;
-	local_table->store(index, stack.a);
+	stack.U4 = value;
+	local_table->store(index, stack.U4);
 }
 void StackFrame::stores(u2 index, short value)
 {
 	stackType stack;
 	stack.i = value;
-	local_table->store(index, stack.a);
+	local_table->store(index, stack.U4);
 }
 void StackFrame::storea(u2 index, u4 value)
 {
 	stackType stack;
-	stack.a = value;
-	local_table->store(index, stack.a);
+	stack.U4 = value;
+	local_table->store(index, stack.U4);
 }
 void StackFrame::storei(u2 index, int value)
 {
 	stackType stack;
 	stack.i = value;
-	local_table->store(index, stack.a);
+	local_table->store(index, stack.U4);
 }
 void StackFrame::storel(u2 index, long long value)
 {
@@ -205,7 +205,7 @@ void StackFrame::storef(u2 index, float value)
 {
 	stackType stack;
 	stack.f = value;
-	local_table->store(index, stack.a);
+	local_table->store(index, stack.U4);
 }
 void StackFrame::stored(u2 index, double value)
 {
@@ -217,31 +217,31 @@ void StackFrame::stored(u2 index, double value)
 char StackFrame::loadb(u2 index)
 {
 	stackType stack;
-	stack.a = local_table->load(index);
+	stack.U4 = local_table->load(index);
 	return stack.i;
 }
 short StackFrame::loads(u2 index)
 {
 	stackType stack;
-	stack.a = local_table->load(index);
+	stack.U4 = local_table->load(index);
 	return stack.i;
 }
 u2 StackFrame::loadc(u2 index)
 {
 	stackType stack;
-	stack.a = local_table->load(index);
-	return stack.a;
+	stack.U4 = local_table->load(index);
+	return stack.U4;
 }
 u4 StackFrame::loada(u2 index)
 {
 	stackType stack;
-	stack.a = local_table->load(index);
-	return stack.a;
+	stack.U4 = local_table->load(index);
+	return stack.U4;
 }
 int StackFrame::loadi(u2 index)
 {
 	stackType stack;
-	stack.a = local_table->load(index);
+	stack.U4 = local_table->load(index);
 	return stack.i;
 }
 long long StackFrame::loadl(u2 index)
@@ -254,7 +254,7 @@ long long StackFrame::loadl(u2 index)
 float StackFrame::loadf(u2 index)
 {
 	stackType stack;
-	stack.a = local_table->load(index);
+	stack.U4 = local_table->load(index);
 	return stack.f;
 }
 double StackFrame::loadd(u2 index)
