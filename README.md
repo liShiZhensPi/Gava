@@ -1,14 +1,14 @@
 # Gava
 Gava as java
 
-![](\GVM.png)
+![preview](GVM.png)
 
-![](\GVM1.png)
+![preview](GVM1.png)
 
-![](\GVM2.png)
+![preview](GVM2.png)
 
-- [ ] ʵ�־�̬�����ĳ�ʼ������sun jvm �У���final��־�ľ�̬������ʹ��ConstantValue������class����ʱ���г�ʼ����û��final��־�ľ�̬���� ��<clinit>�н��г�ʼ����
+- [ ] 实现静态变量的初始化，在sun jvm 中，有final标志的静态变量是使用ConstantValue属性在class加载时进行初始化，没有final标志的静态变量 在<clinit>中进行初始化。
 
-- [ ] �����Ĵ���ֻ�ܴ��ݻ������͵ģ����ܴ���class
+- [ ] 函数的传参只能传递基本类型的，不能传递class
 
   
